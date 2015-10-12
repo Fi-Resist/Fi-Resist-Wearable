@@ -1,0 +1,21 @@
+{
+  "name": "fireresistserver",
+  "version": "1.0.0",
+  "description": "server component for fi-resist",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec ./test/ --recursive"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "4.10.2",
+    "socket.io": "1.3.7"
+  },
+  "devDependencies": {
+    "chai": "3.3.0",
+    "mocha": "2.3.3",
+    "proxyquire": "1.7.3",
+    "sinon": "1.17.1"
+  }
+}
