@@ -14,7 +14,7 @@ describe("socketHandler", function() {
 	describe("emitData", function() {
 		describe("with a proper event", function() {
 			it("should emit the data", function() {
-				socketHandler.emitData(io, { msg: 'hi' }, SOCKET_EVENTS.SEND.officer);
+				socketHandler.emitData(io, { msg: 'hi' }, SOCKET_EVENTS.send.UPDATE);
 				assert.isTrue(io.emit.called);
 			});
 		});
