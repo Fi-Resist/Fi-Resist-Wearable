@@ -1,11 +1,12 @@
 // Set of constants (mostly for sockets
 module.exports = {
 	socket: {
-		RECEIVE: {
-			firefighter: "firefighter-data"
+		receive: {
+			NEW: "new-firefighter",
+			UPDATE: "update-firefighter"
 		},
-		SEND: {
-			officer: "new-data"
+		send: {
+			UPDATE: "officer-update"
 		}
 	}
 };
