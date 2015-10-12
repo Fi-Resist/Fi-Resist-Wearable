@@ -1,4 +1,5 @@
 var socketHandler = require("../../socketHandler/socketHandler");
+var SOCKET_EVENTS = require("../../constant/constant").socket;
 var sinon = require("sinon");
 var assert = require("chai").assert;
 
@@ -11,9 +12,17 @@ describe("socketHandler", function() {
 		};
 	});
 	describe("emitData", function() {
-		it("should emit the data", function() {
-			socketHandler.emitData(io, { msg: 'hi' }, "SOCKET");
-			assert.isTrue(io.emit.called);
+		describe("with a proper event", function() {
+			it("should emit the data", function() {
+				socketHandler.emitData(io, { msg: 'hi' }, SOCKET_EVENTS.SEND.officer);
+				assert.isTrue(io.emit.called);
+			});
+		});
+		describe("with an invalid event", function() {
+			it("should not emit the data", function() {
+				socketHandler.emitData(io, { msg: 'hi' }, "SOCKET");
+				assert.isFalse(io.emit.called);
+			});	
 		});
 	});
 });
