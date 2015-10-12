@@ -3,7 +3,7 @@ var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var socketHandler = require("./socketHandler/socketHandler");
-var SOCKET_MESSAGES = require("./constant/constant").socket;
+var SOCKET_EVT = require("./constant/constant").socket;
 
 app.use(express.static("public"));
 
@@ -16,8 +16,8 @@ io.on("connection", function(socket) {
 	console.log("a user connected");
 
 	//get msg from firefighter app
-	socket.on(SOCKET_MESSAGES.firefighter.DATA, function(msg) {
-		socketHandler.emitData(io, msg, SOCKET_MESSAGES.officer.DATA);
+	socket.on(SOCKET_EVT.RECEIVE.firefighter, function(msg) {
+		socketHandler.emitData(io, msg, SOCKET_EVT.SEND.officer);
 	});
 });
 
