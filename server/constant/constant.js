@@ -1,12 +1,11 @@
 // Set of constants (mostly for sockets
 module.exports = {
 	socket: {
-		firefighter: {
-			DATA: "firefighter-data"
+		RECEIVE: {
+			firefighter: "firefighter-data"
 		},
-		officer: {
-			DATA: "new-data",
-			REQUEST_FOR_DATA: "new-request-data"
+		SEND: {
+			officer: "new-data"
 		}
 	}
 };
