@@ -1,6 +1,8 @@
 // Constant for socket events
 angular.module("app")
-	.constant("socketEvent", {
-			UPDATE: "officer-update"
+	.constant("event", {
+		SOCKET_UPDATE: "officer-update",
+		SCOPE_UPDATE: "scope:update",
+		SCOPE_CREATE: "scope:create"
 	});
 

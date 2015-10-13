@@ -1,29 +1,8 @@
+// firefighter service
+// internaly stores firefighters with create, update, read services
 angular.module("app")
-	.factory("firefighters", function() {
-		var firefighters = [
-			{
-				name: "John Firefighter",
-				id: 1,
-				bpm: 90,
-				resp: 30
-			},
-			{
-				name: "Bill Firefighter",
-				id: 2,
-				bpm: 90,
-				resp: 30
-
-			},
-			{
-				name: "Jeff Firefighter",
-				id: 3,
-				bpm: 140,
-				resp: 30
-
-			},
-		]
-
-
+	.factory("firefighters", function($rootScope, event) {
+		var firefighters = [];
 
 		var get = function(id) {
 			if (id) {
@@ -37,7 +16,22 @@ angular.module("app")
 			return null;
 		};
 
+		var update = function(fighter) {
+			// update firefighter
+			var index = _.indexOf(firefighters, { id: fighter.id });
+			firefighters[id] = fighter;
+			$rootScope.$broadcast(event.SCOPE_UPDATE);
+		};
+
+		var create = function(fighter) {
+			// create new firefighter
+			firefighters.push(figher);
+			$rootScope.$broadcast(event.SCOPE_CREATE);
+		};
+
 		return {
-			get: get
+			get: get,
+			update: update,
+			create: create
 		};
 	});

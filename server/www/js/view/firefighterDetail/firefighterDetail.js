@@ -1,7 +1,10 @@
 angular.module("app")
-	.controller("firefighterDetailCtrl", function($scope, $stateParams, firefighters) {
-		$scope.$on("$ionicView.beforeEnter", function() {
+	.controller("firefighterDetailCtrl", function($scope, $stateParams, firefighters, event) {
+
+		var refreshData = function() {
 			$scope.firefighter = firefighters.get($stateParams.id);
-			console.log($scope.firefighter);
-		});
+		};
+
+		$scope.$on("$ionicView.beforeEnter", refreshData);
+		$scope.$on(event.SCOPE_UPDATE, refreshData);
 	});
