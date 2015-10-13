@@ -8,7 +8,7 @@ var FIREFIGHTERS = [];
 
 
 
-app.use(express.static("public"));
+app.use(express.static("www"));
 
 app.get("/", function(req, res) {
 	res.sendFile(__dirname + "/public/index.html");
