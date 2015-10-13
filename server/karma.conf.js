@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: 'www',
 
 
     // frameworks to use
@@ -15,13 +15,14 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-	  'www/lib/ionic/js/ionic.bundle.js',
-      'www/lib/angular-socket-io/mock/socket-io.js', //mock io global
-  	  'www/lib/angular-mocks/angular-mocks.js',
-  	  'www/lib/angular-socket-io/socket.js',
-	  'www/js/**/*.js',
-      'www/js/**/*.spec.js',
-	  'www/js/**/*.html'
+	  'lib/lodash/lodash.js',
+	  'lib/ionic/js/ionic.bundle.js',
+	  'js/**/*.html',
+      'lib/angular-socket-io/mock/socket-io.js', //mock io global
+  	  'lib/angular-mocks/angular-mocks.js',
+  	  'lib/angular-socket-io/socket.js',
+	  'js/**/*.js',
+      'js/**/*.spec.js'
     ],
 
 
@@ -34,19 +35,19 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-		"**/*.html": ["ng-html2js"]
+		"js/view/**/*.html": ["ng-html2js"]
     },
 
   	ngHtml2JsPreprocessor: {
 		moduleName: "templates",
-		stripPrefix: "www/"
+		stripPrefix: "/"
 	},
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['dots'],
 
 
     // web server port
@@ -73,6 +74,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   })
 }
