@@ -1,3 +1,4 @@
 server/node_modules
 *.swp
 server/public/lib
+server/www/lib
