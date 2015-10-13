@@ -4,7 +4,9 @@
   "description": "server component for fi-resist",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R spec ./test/ --recursive"
+    "test": "npm run test-server && npm run test-client",
+	"test-server": "mocha -R spec ./test/ --recursive",
+	"test-client": "karma start --single-run"
   },
   "author": "",
   "license": "ISC",
