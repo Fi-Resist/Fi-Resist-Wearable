@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test-server && npm run test-client",
-	"test-server": "mocha -R spec ./test/ --recursive",
-	"test-client": "karma start --single-run"
+    "test-server": "mocha -R spec ./test/ --recursive",
+    "test-client": "karma start --single-run",
+    "postinstall": "bower install"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +17,7 @@
     "socket.io": "1.3.7"
   },
   "devDependencies": {
+    "bower": "1.5.3",
     "chai": "3.3.0",
     "karma": "0.13.10",
     "karma-chai": "0.1.0",
