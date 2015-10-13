@@ -1,7 +1,7 @@
 describe("firefighters service", function() {
 	var _firefighters;
 	beforeEach(function() {
-		module('app')
+		module('app.services')
 		inject(function(firefighters) {
 			_firefighters = firefighters;
 		});

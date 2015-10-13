@@ -2,8 +2,7 @@ describe("firefighterList controller", function() {
 	var scope, rootScope, firefightersServiceStub, _event, _firefighters;
 
 	beforeEach(function() {
-		module('app');
-		module('templates');
+		module('app.controllers');
 
 		inject(function($rootScope, $controller, event, firefighters) {
 

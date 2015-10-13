@@ -1,4 +1,4 @@
-angular.module("app")
+angular.module("app.controllers")
 	.controller("firefighterListCtrl", function($scope, firefighters, event) {
 
 		var refreshData = function() {

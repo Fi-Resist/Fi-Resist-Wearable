@@ -2,8 +2,7 @@ describe("firefighterDetail controller", function() {
 	var scope, firefightersServiceStub, rootScope, _event;
 
 	beforeEach(function() {
-		module("app");
-		module("templates");
+		module("app.controllers");
 		inject(function($rootScope, $controller, event) {
 			scope = $rootScope.$new();
 			_event = event;

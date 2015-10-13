@@ -1,6 +1,6 @@
 // firefighter service
 // internaly stores firefighters with create, update, read services
-angular.module("app")
+angular.module("app.services")
 	.factory("firefighters", function($rootScope, event) {
 		var firefighters = [];
 

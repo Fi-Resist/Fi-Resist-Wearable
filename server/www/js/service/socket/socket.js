@@ -1,5 +1,5 @@
 // Factory exposes socket.io to angular modules
-angular.module("app")
+angular.module("app.services")
 	.factory("socket", function(socketFactory, event) {
 		var mySocket = io.connect("http://localhost:3000/");
 

@@ -21,6 +21,9 @@ module.exports = function(config) {
       'lib/angular-socket-io/mock/socket-io.js', //mock io global
   	  'lib/angular-mocks/angular-mocks.js',
   	  'lib/angular-socket-io/socket.js',
+	  "js/constant/index.js",
+	  "js/service/index.js",
+	  "js/view/index.js",
 	  'js/**/*.js',
       'js/**/*.spec.js'
     ],
@@ -28,7 +31,9 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      '**/*.swp'
+      '**/*.swp',
+	  'js/bootstrap.js',
+	  'js/app.js'
     ],
 
 
@@ -40,7 +45,6 @@ module.exports = function(config) {
 
   	ngHtml2JsPreprocessor: {
 		moduleName: "templates",
-		stripPrefix: "/"
 	},
 
 
