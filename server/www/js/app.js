@@ -28,18 +28,18 @@ angular.module('app', ['ionic', 'btford.socket-io'])
     .state('app', {
     url: '/app',
     abstract: true,
-    templateUrl: 'js/menu/menu.html',
+    templateUrl: 'js/view/menu/menu.html',
   })
 
 	.state("app.firefighterList", {
 		url: "",
-		templateUrl: "js/firefighterList/firefighterList.html",
+		templateUrl: "js/view/firefighterList/firefighterList.html",
 		controller: "firefighterListCtrl"
 	})
 
 	.state("app.firefighterDetail", {
 		url: "/fighter/:id",
-		templateUrl: "js/firefighterDetail/firefighterDetail.html",
+		templateUrl: "js/view/firefighterDetail/firefighterDetail.html",
 		controller: "firefighterDetailCtrl"
 	});
 
