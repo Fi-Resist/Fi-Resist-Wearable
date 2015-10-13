@@ -18,20 +18,33 @@ angular.module("app")
 
 		var update = function(fighter) {
 			// update firefighter
-			var index = _.indexOf(firefighters, { id: fighter.id });
-			firefighters[id] = fighter;
+			var index = _.findIndex(firefighters, { id: fighter.id });
+			firefighters[index] = fighter;
 			$rootScope.$broadcast(event.SCOPE_UPDATE);
 		};
 
 		var create = function(fighter) {
 			// create new firefighter
-			firefighters.push(figher);
+			firefighters.push(fighter);
 			$rootScope.$broadcast(event.SCOPE_CREATE);
 		};
+
+
+		var remove = function(id) {
+			if (id) {
+				_.remove(firefighters, function(f) {
+					return f.id === id;
+				});
+			}
+			else {
+				firefighters = [];
+			}
+		}
 
 		return {
 			get: get,
 			update: update,
-			create: create
+			create: create,
+			remove: remove
 		};
 	});
