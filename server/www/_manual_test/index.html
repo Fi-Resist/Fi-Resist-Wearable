@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Manual Test</title>
+    <style>
+     body {
+       font-family: sans-serif;
+     }
+     .header {
+       line-height: 1.5;
+       font-size: 1.3em;
+     }
+     .green {
+       color: green;
+     }
+     .red {
+       color: red;
+     }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Manual Test</h1>
+      <p>This page will connect to a running socket server and send test JSON to it</p>
+    </div>
+    <div>
+      <p>You are <span class="red" id="sock-status">not connected</span>
+    </div>
+    <div>
+      <button id="new-data">Send New Data</button>
+      <button id="send-data">Send Data update</button>
+    </div>
+
+    <script src="/lib/socket.io-client/socket.io.js"></script>
+    <script>
+     var sockStatus = document.getElementById("sock-status");
+          
+     var socket = io();
+     socket.on("connect", function() {
+       console.log("connect");
+       sockStatus.innerHTML = "connected";
+       sockStatus.className = "green";
+     });
+    </script>
+    
+  </body>
+
+
+  
+</html>
