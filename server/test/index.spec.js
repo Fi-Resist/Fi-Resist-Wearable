@@ -14,7 +14,17 @@ var ioStub = function() {
 	};
 };
 
-var index = proxyquire("../index.js", { "socket.io": ioStub});
+
+var httpStub = {
+	Server: sinon.stub().returns({
+		listen: sinon.stub()
+	})
+};
+
+var index = proxyquire("../index.js", { 
+	"socket.io": ioStub,
+	"http": httpStub
+});
 
 describe("index", function() {
 	it("should initialize socket listeners", function() {
