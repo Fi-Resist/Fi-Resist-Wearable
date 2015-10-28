@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="connect">new-firefighter</string>
+  <string name="update">update-firefighter</string>
+</resources>
