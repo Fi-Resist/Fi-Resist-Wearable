@@ -14,9 +14,6 @@ app.get("/", function(req, res) {
 	res.sendFile(__dirname + "/public/index.html");
 });
 
-app.get("/test", function(req, res) {
-  res.sendFile(__dirname + "/www/_manual_test/index.html");
-});
 
 io.on("connection", function(socket) {
 	console.log("a user connected");
