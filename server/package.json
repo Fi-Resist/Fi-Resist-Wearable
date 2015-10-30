@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test-server && npm run test-client",
-    "test-server": "mocha -R spec ./test/ --recursive",
+    "test-server": "mocha -R spec ./server/test/ --recursive",
     "test-client": "karma start --single-run",
     "postinstall": "bower install"
   },
