@@ -5,3 +5,4 @@ server/www/lib
 *.*~
 phone/target
 phone/src/main/res/values/host.xml
+server/node
