@@ -1,8 +1,10 @@
-server/node_modules
 *.swp
-server/public/lib
-server/monitor-app/www/lib
 *.*~
-phone/target
-phone/src/main/res/values/host.xml
-server/node
+android-app/target
+android-app/src/main/res/values/host.xml
+node-components/node
+node-components/monitor-app/platforms
+node-components/monitor-app/plugins
+node-components/node_modules
+node-components/public/lib
+node-components/monitor-app/www/lib

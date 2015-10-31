@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 	<name>FiResist Application</name>
 	<modules>
-		<module>phone</module>
-		<module>server</module>
+		<module>android-app</module>
+		<module>node-components</module>
 	</modules>
 </project>
