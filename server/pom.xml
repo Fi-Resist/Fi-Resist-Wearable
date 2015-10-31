@@ -4,10 +4,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fi.resist</groupId>
-	<artifactId>firesist-parent</artifactId>
+	<artifactId>firesist-node</artifactId>
 	<version>0.1.0</version>
 	<packaging>pom</packaging>
-	<name>FiResist Server</name>
+	<name>FiResist Node Components</name>
 	<build>
 		<plugins>
 			<plugin>
