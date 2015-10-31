@@ -1,7 +1,7 @@
 server/node_modules
 *.swp
 server/public/lib
-server/www/lib
+server/monitor-app/www/lib
 *.*~
 phone/target
 phone/src/main/res/values/host.xml
