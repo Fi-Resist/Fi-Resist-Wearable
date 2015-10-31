@@ -1,27 +1,35 @@
-# Server Install instructions
+# FiResist Application
 
-1. Install [Node.js](https://nodejs.org/en/)
-2. Navigate to `<repo>/server`
-3. Run `npm install`
+FiResist contains three components:
 
-# Running
+1. Android application which connects to wearable and monitors firefighters
+2. Socket server which receives real time data from the Android application
+3. Ionic (hybrid-mobile app) application which receives real time data from the server about the firefighters
 
-`node index.js`
+# Installation
 
-# Test
+### Global Dependencies
 
-`npm test`
+- [Maven](https://maven.apache.org/)
+- [NodeJS](https://nodejs.org/en/)
+- [Ionic](http://ionicframework.com/)
 
+Installation of each application's dependencies is handled through Maven.
 
-# Phone (firefighter)
+### Configuration
 
-1. Install [Maven](https://maven.apache.org/)
-2. Install [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-3. Install [Android SDK](http://developer.android.com/sdk/index.html)
-4. Navigate to `<repo>/phone`
-5. Add a [string resource](http://developer.android.com/guide/topics/resources/string-resource.html) called *host* which corresponds to the IP Address of the server
-5. Run `mvn package`
-6. Install the APK located in `<repo>/phone/target` to the emulator/Android platform of choice
+**TODO: Write config script**
 
+**For the Android application:**
 
+In `android-app/src/main/res/values` create a file called `host.xml` to define the IP address of the server you're connecting to. For example:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="host">http://192.168.1.1</string>
+</resources>
+```
+
+**TODO: Make Node components configurable**
 
