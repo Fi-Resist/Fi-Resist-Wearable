@@ -7,7 +7,7 @@
     "test": "npm run test-server && npm run test-client",
     "test-server": "mocha -R spec ./server/test/ --recursive",
     "test-client": "karma start --single-run",
-    "install-client": "node build_monitor_app.js",
+    "install-client": "node install_client.js",
     "postinstall": "bower install"
   },
   "author": "",
