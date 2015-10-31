@@ -43,6 +43,15 @@
 							<arguments>run test</arguments>
 						</configuration>
 					</execution>
+					<execution>
+						<id>ionic build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run install-client</arguments>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
