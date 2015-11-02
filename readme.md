@@ -31,5 +31,13 @@ In `android-app/src/main/res/values` create a file called `host.xml` to define t
 </resources>
 ```
 
-**TODO: Make Node components configurable**
+**For the monitoring application**
+
+In `node-components/monitor-app/www/` create a `config.json` to define the server to connect to:
+
+```json
+{
+	"host": "http://localhost:3000"
+}
+```
 
