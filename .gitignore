@@ -8,3 +8,4 @@ node-components/monitor-app/plugins
 node-components/node_modules
 node-components/public/lib
 node-components/monitor-app/www/lib
+node-components/monitor-app/www/config.json
