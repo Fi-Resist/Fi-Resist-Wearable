@@ -10,6 +10,14 @@ import android.widget.Toast;
  * Runs in background, grabbing data from devices and emitting it
  */
 public class FiReceiver extends BroadcastReceiver {
+
+
+	public FiReceiver() {
+	}
+
+	/**
+	  * Reads data from wearables and broadcasts it
+	  */
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Toast.makeText(context, "Running", Toast.LENGTH_SHORT)

@@ -10,8 +10,6 @@ import android.content.Context;
 import android.widget.Toast;
 import android.view.View;
 
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 
 import java.net.URISyntaxException;
 import org.firesist.receiver.FiReceiver;
@@ -30,8 +28,6 @@ public class FiResistActivity extends Activity {
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
-
-
     }
 
 	@Override
