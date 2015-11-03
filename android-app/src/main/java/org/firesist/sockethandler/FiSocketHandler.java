@@ -78,13 +78,17 @@ public class FiSocketHandler {
 	/**
 	 * Wrapper for socket connect method
 	 * Connects firefighter to server, sends name + id
+	 * Does nothing if socket is already connected
 	 */
 	public void connect() {
+		if (socket.connected()) return;
+		System.out.println("CONNECTING");
+
 		socket.connect();
 		JSONObject newFirefighter = new JSONObject();
 		try {
-			newFirefighter.append("name", firefighterName);
-			newFirefighter.append("id", firefighterId);
+			newFirefighter.accumulate("name", firefighterName);
+			newFirefighter.accumulate("id", firefighterId);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} finally {
@@ -101,13 +105,14 @@ public class FiSocketHandler {
 
 	/**
      * Sends update to server
-	 * @param json Json object to send
+	 * @param eventName Name of the event (e.g. NEW-FIREFIGHTER)
+	 * @param update Json object to send
 	 */
-	public void sendUpdate(JSONObject update) throws JSONException {
+	public void sendUpdate(String eventName, JSONObject update) throws JSONException {
 		// append ID + name to object
 		update.append("name", firefighterName);
 		update.append("id", firefighterId);
-		sendJSON(MSG_UPDATE_FIREFIGHTER, update);
+		sendJSON(eventName, update);
 	}
 }
 
