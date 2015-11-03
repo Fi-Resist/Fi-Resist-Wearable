@@ -5,6 +5,7 @@ var io = require("socket.io")(http);
 var socketHandler = require("./socketHandler/socketHandler");
 var SOCKET_EVT = require("./constant/constant").socket;
 var FIREFIGHTERS = [];
+var _ = require("lodash");
 
 
 
@@ -20,17 +21,39 @@ io.on("connection", function(socket) {
 
 	// receive a new firefighter
 	socket.on(SOCKET_EVT.receive.NEW, function(msg) {
-		FIREFIGHTERS.push(msg);
+
+		/**
+		 * Firefighter object:
+		 *  id: unique identifier
+		 * 	bio: Object containing name & biometric data
+		 *  position: array of data points showing movement history
+		 */
+		var newFirefighter = {
+			id: msg.id,
+			bio: _.omit(msg, "id"),
+			position: []
+		};
+		FIREFIGHTERS.push(newFirefighter);
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
 	});
 
-	//update a firefighter's data
-	socket.on(SOCKET_EVT.receive.UPDATE, function(msg) {
+	//update a firefighter's biometrics
+	socket.on(SOCKET_EVT.receive.UPDATE_BIOMETRICS, function(msg) {
 		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
-		FIREFIGHTERS[index] = msg;
-
+		FIREFIGHTERS[index].bio = msg;
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
 	});
+
+	//update a firefighters position
+	socket.on(SOCKET_EVT.receive.UPDATE_POSITION, function(msg) {
+		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
+
+		//Firefighters position is an array of data points
+		FIREFIGHTERS[index].position.push(msg);
+		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
+	});
+
+
 });
 
 

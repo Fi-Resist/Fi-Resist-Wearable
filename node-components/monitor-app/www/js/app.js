@@ -44,6 +44,12 @@ angular.module("app").run(function($ionicPlatform) {
 		url: "/fighter/:id",
 		templateUrl: "js/view/firefighterDetail/firefighterDetail.html",
 		controller: "firefighterDetailCtrl"
+	})
+
+	.state("app.firefighterMap", {
+		url: "/map",
+		templateUrl: "js/view/firefighterMap/firefighterMap.html",
+		controller: "firefighterMapCtrl"
 	});
 
   // if none of the above states are matched, use this as the fallback
