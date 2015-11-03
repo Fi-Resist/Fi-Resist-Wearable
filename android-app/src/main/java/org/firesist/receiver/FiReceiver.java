@@ -11,6 +11,8 @@ import org.firesist.sockethandler.FiSocketHandler;
  */
 public class FiReceiver extends BroadcastReceiver {
 
+	private final String UPDATE_BIOMETRICS = "update-biometrics";
+	private final String UPDATE_POSITION = "update-position";
 
 	public FiReceiver() {
 	}
