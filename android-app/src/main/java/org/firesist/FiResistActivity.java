@@ -3,6 +3,7 @@ package org.firesist;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import android.content.Intent;
@@ -13,17 +14,24 @@ import android.view.View;
 
 import java.net.URISyntaxException;
 import org.firesist.receiver.FiReceiver;
+import org.firesist.sockethandler.FiSocketHandler;
 
 public class FiResistActivity extends Activity {
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
 	private final int INTERVAL = 1000;
+	private EditText nameInput;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.firesist_layout);
+		nameInput = (EditText) findViewById(R.id.edit_name);
+
+
+		FiSocketHandler.getInstance()
+			.initSocket(getString(R.string.host));
 
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
@@ -39,8 +47,23 @@ public class FiResistActivity extends Activity {
 	 * Starts monitoring devices on an interval
 	 */
 	public void startAlarm(View view) {
-		manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
+		String name = nameInput.getText()
+			.toString()
+			.trim();
+
+		if (name.isEmpty()) {
+			Toast.makeText(this, "Please input a name", Toast.LENGTH_SHORT).show();
+		}
+		else {
+
+			FiSocketHandler.getInstance()
+				.setName(name);
+			FiSocketHandler.getInstance()
+				.connect();
+
+			manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
+		}
 	}
 
 	/**
