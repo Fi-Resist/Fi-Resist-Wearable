@@ -7,6 +7,11 @@ angular.module("app.services")
 			ioSocket: mySocket
 		});
 
+		//on connection, request ff data
+		sock.on("connect", function(evt, data) {
+				io.emit(event.REQUEST_INFO);
+		});
+
 		sock.on(event.SOCKET_CREATE, function(evt, data) {
 			//create
 			firefighters.create(data);
