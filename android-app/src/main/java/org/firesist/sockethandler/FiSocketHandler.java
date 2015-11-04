@@ -14,6 +14,8 @@ public class FiSocketHandler {
 	// Socket message constants
 	private final String MSG_NEW_FIREFIGHTER = "new-firefighter";
 	private final String MSG_UPDATE_FIREFIGHTER = "update-firefighter";
+	private final String MSG_DISCONNECT_FIREFIGHTER = "delete-firefighter";
+
 	private int firefighterId;
 	private String firefighterName;
 	private static FiSocketHandler fiSocketHandlerInstance;
@@ -99,7 +101,9 @@ public class FiSocketHandler {
 	/**
 	 * Wrapper for socket's disconnect method
 	 */
-	public void disconnect() {
+	public void disconnect() throws JSONException {
+		// Tell server we're leaving then close connection
+		sendUpdate(MSG_DISCONNECT_FIREFIGHTER, new JSONObject()); 
 		socket.disconnect();
 	}
 
