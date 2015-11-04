@@ -58,6 +58,14 @@ io.on("connection", function(socket) {
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
 	});
 
+	//Firefighter disconnects app
+	socket.on(SOCKET_EVT.receive.DELETE, function(msg) {
+		FIREFIGHTERS = _.remove(FIREFIGHTERS, function(firefighter) {
+			return firefighter.id == msg.id;
+		});
+		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
+	});
+
 
 });
 

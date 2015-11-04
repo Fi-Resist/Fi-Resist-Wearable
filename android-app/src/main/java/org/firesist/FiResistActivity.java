@@ -13,6 +13,7 @@ import android.view.View;
 
 
 import java.net.URISyntaxException;
+import org.json.JSONException;
 import org.firesist.receiver.FiReceiver;
 import org.firesist.sockethandler.FiSocketHandler;
 
@@ -45,8 +46,12 @@ public class FiResistActivity extends Activity {
 		if (manager != null) {
 			manager.cancel(pendingIntent);
 		}
-		FiSocketHandler.getInstance()
-			.disconnect();
+		try {
+			FiSocketHandler.getInstance()
+				.disconnect();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
