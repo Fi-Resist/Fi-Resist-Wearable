@@ -6,8 +6,8 @@ module.exports = {
 			NEW: "new-firefighter",
 			UPDATE: "update-firefighter",
 			UPDATE_BIOMETRICS: "update-biometrics",
-			UPDATE_POSITION: "update-position"
-
+			UPDATE_POSITION: "update-position",
+			DELETE: "delete-firefighter"
 		},
 		// These are the messages to be sent to the monitoring application
 		send: {
