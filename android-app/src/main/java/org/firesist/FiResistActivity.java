@@ -41,6 +41,12 @@ public class FiResistActivity extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
+		if (manager != null) {
+			manager.cancel(pendingIntent);
+		}
+		FiSocketHandler.getInstance()
+			.disconnect();
 	}
 
 	/**

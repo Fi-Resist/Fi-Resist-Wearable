@@ -110,8 +110,8 @@ public class FiSocketHandler {
 	 */
 	public void sendUpdate(String eventName, JSONObject update) throws JSONException {
 		// append ID + name to object
-		update.append("name", firefighterName);
-		update.append("id", firefighterId);
+		update.accumulate("name", firefighterName);
+		update.accumulate("id", firefighterId);
 		sendJSON(eventName, update);
 	}
 }
