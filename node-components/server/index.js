@@ -15,12 +15,17 @@ app.get("/", function(req, res) {
 	res.sendFile(__dirname + "/public/index.html");
 });
 
+app.post("/post", function(req, res) {
+	console.log("POST!");
+	console.log(req);
+});
 
 io.on("connection", function(socket) {
 	console.log("a user connected");
 
 	// receive a new firefighter
 	socket.on(SOCKET_EVT.receive.NEW, function(msg) {
+		console.log(msg);
 
 		/**
 		 * Firefighter object:
