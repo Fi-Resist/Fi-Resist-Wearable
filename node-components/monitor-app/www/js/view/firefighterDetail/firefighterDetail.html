@@ -2,8 +2,13 @@
 	<ion-content>
 		<h3>{{firefighter.name}}</h3>
 		<ion-list>
-			<ion-item><i class="icon ion-ios-heart-outline"></i> {{firefighter.bpm}} BPM</ion-item>
-			<ion-item><i class="icon ion-ios-cloud-outline"></i> {{firefighter.resp}}</ion-item>
+			<ion-item><i class="icon ion-ios-heart-outline"></i> {{firefighter.bio.bpm}} BPM</ion-item>
+			<ion-item><i class="icon ion-ios-cloud-outline"></i> {{firefighter.bio.resp}}</ion-item>
 		</ion-list>
+		<h3>Movement History</h3>
+		<ion-list>
+			<ion-item ng-repeat="pos in firefighter.position">
+				{{pos}}
+			</ion-item>
 	</ion-content>
 </ion-view>

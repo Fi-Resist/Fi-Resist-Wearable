@@ -14,6 +14,8 @@ public class FiSocketHandler {
 	// Socket message constants
 	private final String MSG_NEW_FIREFIGHTER = "new-firefighter";
 	private final String MSG_UPDATE_FIREFIGHTER = "update-firefighter";
+	private final String MSG_DISCONNECT_FIREFIGHTER = "delete-firefighter";
+
 	private int firefighterId;
 	private String firefighterName;
 	private static FiSocketHandler fiSocketHandlerInstance;
@@ -78,13 +80,17 @@ public class FiSocketHandler {
 	/**
 	 * Wrapper for socket connect method
 	 * Connects firefighter to server, sends name + id
+	 * Does nothing if socket is already connected
 	 */
 	public void connect() {
+		if (socket.connected()) return;
+		System.out.println("CONNECTING");
+
 		socket.connect();
 		JSONObject newFirefighter = new JSONObject();
 		try {
-			newFirefighter.append("name", firefighterName);
-			newFirefighter.append("id", firefighterId);
+			newFirefighter.accumulate("name", firefighterName);
+			newFirefighter.accumulate("id", firefighterId);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} finally {
@@ -95,19 +101,22 @@ public class FiSocketHandler {
 	/**
 	 * Wrapper for socket's disconnect method
 	 */
-	public void disconnect() {
+	public void disconnect() throws JSONException {
+		// Tell server we're leaving then close connection
+		sendUpdate(MSG_DISCONNECT_FIREFIGHTER, new JSONObject()); 
 		socket.disconnect();
 	}
 
 	/**
      * Sends update to server
-	 * @param json Json object to send
+	 * @param eventName Name of the event (e.g. NEW-FIREFIGHTER)
+	 * @param update Json object to send
 	 */
-	public void sendUpdate(JSONObject update) throws JSONException {
+	public void sendUpdate(String eventName, JSONObject update) throws JSONException {
 		// append ID + name to object
-		update.append("name", firefighterName);
-		update.append("id", firefighterId);
-		sendJSON(MSG_UPDATE_FIREFIGHTER, update);
+		update.accumulate("name", firefighterName);
+		update.accumulate("id", firefighterId);
+		sendJSON(eventName, update);
 	}
 }
 
