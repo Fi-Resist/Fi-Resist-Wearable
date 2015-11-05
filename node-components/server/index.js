@@ -12,7 +12,7 @@ var _ = require("lodash");
 app.use(express.static("www"));
 
 app.get("/", function(req, res) {
-	res.sendFile(__dirname + "/public/index.html");
+	res.send("Server Running!");
 });
 
 app.post("/post", function(req, res) {
@@ -74,8 +74,9 @@ io.on("connection", function(socket) {
 
 });
 
+var port = process.env.PORT || 3000
 
-http.listen(3000, function() {
-	console.log("Listening");
+http.listen(port, function() {
+	console.log("Listening on 3000");
 });
 
