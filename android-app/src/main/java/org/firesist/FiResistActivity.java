@@ -1,6 +1,7 @@
 package org.firesist;
 
 import android.app.Activity;
+import android.os.Vibrator;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.EditText;
@@ -72,17 +73,27 @@ public class FiResistActivity extends Activity {
 			FiSocketHandler.getInstance()
 				.connect();
 
+			//Vibrate indicating connection success
+			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+			vibrator.vibrate(500);
+
 			manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
 		}
 	}
 
 	/**
-	 * Turns off monitor
+	 * Turns off monitor, disconnects socket
 	 */
 	public void cancelAlarm(View view) {
 		if (manager != null) {
 			manager.cancel(pendingIntent);
+			try {
+				FiSocketHandler.getInstance()
+					.disconnect();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
 		}
 	}
