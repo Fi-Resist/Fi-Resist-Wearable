@@ -9,10 +9,10 @@ var _ = require("lodash");
 
 
 
-app.use(express.static("www"));
+app.use(express.static("server/static"));
 
 app.get("/", function(req, res) {
-	res.send("Server Running!");
+	res.sendFile(__dirname + "/static/index.html");
 });
 
 app.post("/post", function(req, res) {
@@ -25,6 +25,7 @@ io.on("connection", function(socket) {
 
 	// receive a new firefighter
 	socket.on(SOCKET_EVT.receive.NEW, function(msg) {
+		console.log("New Event received");
 		console.log(msg);
 
 		/**
@@ -39,11 +40,13 @@ io.on("connection", function(socket) {
 			position: []
 		};
 		FIREFIGHTERS.push(newFirefighter);
+		console.log(FIREFIGHTERS);
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
 	});
 
 	//update a firefighter's biometrics
 	socket.on(SOCKET_EVT.receive.UPDATE_BIOMETRICS, function(msg) {
+		console.log("Biometrics update");
 		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
 		FIREFIGHTERS[index].bio = msg;
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
@@ -51,6 +54,7 @@ io.on("connection", function(socket) {
 
 	//update a firefighters position
 	socket.on(SOCKET_EVT.receive.UPDATE_POSITION, function(msg) {
+		console.log("Position Update");
 		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
 
 		//Firefighters position is an array of data points
@@ -60,14 +64,17 @@ io.on("connection", function(socket) {
 
 	//Firefighter disconnects app
 	socket.on(SOCKET_EVT.receive.DELETE, function(msg) {
-		FIREFIGHTERS = _.remove(FIREFIGHTERS, function(firefighter) {
+		console.log("Delete request received");
+		_.remove(FIREFIGHTERS, function(firefighter) {
 			return firefighter.id == msg.id;
 		});
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
+		console.log(FIREFIGHTERS);
 	});
 
 	// Chief requests info
 	socket.on(SOCKET_EVT.receive.REQUEST_INFO, function(msg) {
+		console.log(FIREFIGHTERS);
 		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
 	});
 
