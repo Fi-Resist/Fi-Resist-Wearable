@@ -28,7 +28,7 @@ var index = proxyquire("../index.js", {
 
 describe("index", function() {
 	it("should initialize socket listeners", function() {
-		assert.isTrue(socketStub.on.calledTwice, "socket called twice");
+		assert.isTrue(socketStub.on.called, "socket called");
 	});
 
 });

@@ -5,7 +5,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.net.URISyntaxException;
-
+import android.util.Log;
 /**
   * Web socket communication for FiResist
   */
@@ -14,6 +14,7 @@ public class FiSocketHandler {
 	// Socket message constants
 	private final String MSG_NEW_FIREFIGHTER = "new-firefighter";
 	private final String MSG_UPDATE_FIREFIGHTER = "update-firefighter";
+	private final String MSG_CONNECTED = "connect";
 	private final String MSG_DISCONNECT_FIREFIGHTER = "delete-firefighter";
 
 	private int firefighterId;
@@ -34,6 +35,7 @@ public class FiSocketHandler {
 
 	private FiSocketHandler() {
 	}
+
 
 	/**
 	 * Setter for the firefighter name, also generates an Id
@@ -84,7 +86,6 @@ public class FiSocketHandler {
 	 */
 	public void connect() {
 		if (socket.connected()) return;
-		System.out.println("CONNECTING");
 
 		socket.connect();
 		JSONObject newFirefighter = new JSONObject();

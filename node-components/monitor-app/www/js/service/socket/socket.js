@@ -7,13 +7,24 @@ angular.module("app.services")
 			ioSocket: mySocket
 		});
 
-		sock.on(event.SOCKET_CREATE, function(evt, data) {
-			//create
-			firefighters.create(data);
+		//on connection, request ff data
+		sock.on("connect", function(evt, data) {
+				sock.emit(event.REQUEST_INFO);
 		});
 
-		sock.on(event.SOCKET_UPDATE, function(evt, data) {
+		sock.on(event.SOCKET_CREATE, function(data) {
+			//create
+			console.log("update received")
+			console.log(data);
+
+			firefighters.initFirefighterArray(data);
+//			firefighters.create(data);
+		});
+
+		sock.on(event.SOCKET_UPDATE, function(data) {
 			//update
+			console.log("update received")
+			console.log(data);
 			firefighters.update(data);
 		});
 
