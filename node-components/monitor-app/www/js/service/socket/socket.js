@@ -9,16 +9,22 @@ angular.module("app.services")
 
 		//on connection, request ff data
 		sock.on("connect", function(evt, data) {
-				io.emit(event.REQUEST_INFO);
+				sock.emit(event.REQUEST_INFO);
 		});
 
-		sock.on(event.SOCKET_CREATE, function(evt, data) {
+		sock.on(event.SOCKET_CREATE, function(data) {
 			//create
-			firefighters.create(data);
+			console.log("update received")
+			console.log(data);
+
+			firefighters.initFirefighterArray(data);
+//			firefighters.create(data);
 		});
 
-		sock.on(event.SOCKET_UPDATE, function(evt, data) {
+		sock.on(event.SOCKET_UPDATE, function(data) {
 			//update
+			console.log("update received")
+			console.log(data);
 			firefighters.update(data);
 		});
 

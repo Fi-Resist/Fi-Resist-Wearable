@@ -29,6 +29,12 @@ angular.module("app.services")
 			$rootScope.$broadcast(event.SCOPE_CREATE);
 		};
 
+		/**
+		 * initializes firefighters from array
+		 */
+		var initFirefighterArray = function(firefighterArr) {
+			firefighters = firefighterArr;
+		};
 
 		var remove = function(id) {
 			if (id) {
@@ -45,6 +51,7 @@ angular.module("app.services")
 			get: get,
 			update: update,
 			create: create,
+			initFirefighterArray: initFirefighterArray,
 			remove: remove
 		};
 	});
