@@ -26,6 +26,13 @@
 			<artifactId>socket.io-client</artifactId>
 			<version>0.6.0</version>
 		</dependency>
+		<dependency>
+			<groupId>BioHarnessBT</groupId>
+			<artifactId>BioHarnessBT</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${basedir}/BioHarnessBT.jar</systemPath>
+		</dependency>
     </dependencies>
 
     <build>
