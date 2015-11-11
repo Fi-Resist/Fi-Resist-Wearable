@@ -2,7 +2,28 @@ package org.firesist.biometriclistener;
 
 import zephyr.android.BioHarnessBT.*;
 import org.json.JSONObject;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Set;
+
+import android.R.*;
+import android.app.Activity;
+import android.bluetooth.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.*;
+import android.widget.TextView;
 
 public class BiometricListener extends ConnectListenerImpl {
     private Handler _OldHandler;
@@ -16,11 +37,6 @@ public class BiometricListener extends ConnectListenerImpl {
 
     private int GP_HANDLER_ID = 0x20;
     
-    private final int HEART_RATE = 0x100;
-    private final int RESPIRATION_RATE = 0x101;
-    private final int SKIN_TEMPERATURE = 0x102;
-    private final int POSTURE = 0x103;
-    private final int PEAK_ACCLERATION = 0x104;
     /*Creating the different Objects for different types of Packets*/
     private GeneralPacketInfo GPInfo = new GeneralPacketInfo();
     private ECGPacketInfo ECGInfoPacket = new ECGPacketInfo();
@@ -40,8 +56,9 @@ public class BiometricListener extends ConnectListenerImpl {
         
         String message;
     }
-
-	/* Socket broadcast should happen here
+    
+    
+    /* Socket broadcast should happen here
  	 * I think for sending over the socket server we'll have to create events for each biometric
 	 * e.g. BIOMETRIC_HEARTRATE
  	 * Then the socekt server can update the firefighter and broadcast the new data
@@ -121,6 +138,8 @@ public class BiometricListener extends ConnectListenerImpl {
 					// Broadcast socket here
             }
         });
+        
+        
     }
     
 
