@@ -39,8 +39,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
+import org.json.JSONObject;
 
 public class FiResistActivity extends Activity {
+	
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
@@ -51,6 +58,7 @@ public class FiResistActivity extends Activity {
     BluetoothAdapter adapter = null;
     BTClient _bt;
     ZephyrProtocol _protocol;
+
     //BiometricListener _NConnListener;
     private final int HEART_RATE = 0x100;
     private final int RESPIRATION_RATE = 0x101;
@@ -73,65 +81,7 @@ public class FiResistActivity extends Activity {
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
         
-            /*Sending a message to android that we are going to initiate a pairing request*/
-            //IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
-            /*Registering a new BTBroadcast receiver from the Main Activity context with pairing request event*/
-            //this.getApplicationContext().registerReceiver(new BTBroadcastReceiver(), filter);
-            // Registering the BTBondReceiver in the application that the status of the receiver has changed to Paired
-           /* IntentFilter filter2 = new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED");
-            this.getApplicationContext().registerReceiver(new BTBondReceiver(), filter2);
-        
-            
-            Button btnConnect = (Button) findViewById(R.id.ButtonConnect);
-            if (btnConnect != null)
-            {
-                btnConnect.setOnClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        String BhMacID = "00:07:80:9D:8A:E8";
-                        adapter = BluetoothAdapter.getDefaultAdapter();
-                        
-                        Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
-                        
-                        if (pairedDevices.size() > 0)
-                        {
-                            for (BluetoothDevice device : pairedDevices)
-                            {
-                                if (device.getName().startsWith("BH"))
-                                {
-                                    BluetoothDevice btDevice = device;
-                                    BhMacID = btDevice.getAddress();
-                                    break;
-                                    
-                                }
-                            }
-                            
-                            
-                        }
-                        
-                        //BhMacID = btDevice.getAddress();
-                        BluetoothDevice Device = adapter.getRemoteDevice(BhMacID);
-                        String DeviceName = Device.getName();
-                        _bt = new BTClient(adapter, BhMacID);
-                        _NConnListener = new BiometricListener(Newhandler,Newhandler);
-                        _bt.addConnectedEventListener(_NConnListener);
-                        
-                        TextView tv1 = (EditText)findViewById(R.id.labelHeartRate);
-                        tv1.setText("000");
-                        
-                        tv1 = (EditText)findViewById(R.id.labelRespRate);
-                        tv1.setText("0.0");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelSkinTemp);
-                        tv1.setText("0.0");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelPosture);
-                        tv1.setText("000");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelPeakAcc);
-                        tv1.setText("0.0");
-                    }
-                });
-            }*/
+		
     }
 
 	@Override
