@@ -45,15 +45,22 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import android.content.SharedPreferences;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
+
 import org.json.JSONObject;
 
 public class FiResistActivity extends Activity {
 	
+	private SharedPreferences settings;
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
 	private final int INTERVAL = 1000;
 	private EditText nameInput;
+	private String firefighterName;
 	FiConnectedListener connectedListener;
 	BTClient btClient;
 	
@@ -72,8 +79,17 @@ public class FiResistActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.firesist_layout);
 		nameInput = (EditText) findViewById(R.id.edit_name);
+		this.settings = getPreferences(MODE_PRIVATE);
 
 
+		// Set the firefighter name if it's been done before
+		firefighterName = settings.getString("FIREFIGHTER_NAME", null);
+		if (firefighterName == null) {
+			// Launch initial wizard
+			createNameDialog();
+		}
+
+		// Initialize socket connection
 		FiSocketHandler.getInstance()
 			.initSocket(getString(R.string.host));
 
@@ -81,19 +97,26 @@ public class FiResistActivity extends Activity {
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
 		
-			/*Sending a message to android that we are going to initiate a pairing request*/
-			IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
-			/*Registering a new BTBroadcast receiver from the Main Activity context with pairing request event*/
-			this.getApplicationContext().registerReceiver(new BTBroadcastReceiver(), filter);
-			// Registering the BTBondReceiver in the application that the status of the receiver has changed to Paired
-			IntentFilter filter2 = new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED");
-			this.getApplicationContext().registerReceiver(new BTBondReceiver(), filter2);
+		/*Sending a message to android that we are going to initiate a pairing request*/
+		IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
+		/*Registering a new BTBroadcast receiver from the Main Activity context with pairing request event*/
+		this.getApplicationContext().registerReceiver(new BTBroadcastReceiver(), filter);
+		// Registering the BTBondReceiver in the application that the status of the receiver has changed to Paired
+		IntentFilter filter2 = new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED");
+		this.getApplicationContext().registerReceiver(new BTBondReceiver(), filter2);
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
 
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		// Save firefighter name
+		SharedPreferences.Editor editor = this.settings.edit();
+		editor.putString("FIREFIGHTER_NAME", firefighterName);
+		editor.commit();
+
+		// Disconnect Socket
 		if (manager != null) {
 			manager.cancel(pendingIntent);
 		}
@@ -214,6 +237,29 @@ public class FiResistActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	/**
+	  * Creates a prompt for name
+	  */
+	private void createNameDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Set Name");
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		builder.setView(input);
+
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				firefighterName = input.getText().toString();
+			}
+		});
+
+		builder.show();
+
+
 	}
 
 
