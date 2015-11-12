@@ -40,8 +40,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
+import org.json.JSONObject;
 
 public class FiResistActivity extends Activity {
+	
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
