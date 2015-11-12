@@ -64,7 +64,6 @@ public class FiResistActivity extends Activity {
 	FiConnectedListener connectedListener;
 	BTClient btClient;
 	
-	/** Called when the activity is first created. */
 	BluetoothAdapter adapter = null;
 	ZephyrProtocol _protocol;
 	private final int HEART_RATE = 0x100;
@@ -73,6 +72,8 @@ public class FiResistActivity extends Activity {
 	private final int POSTURE = 0x103;
 	private final int PEAK_ACCLERATION = 0x104;
 
+
+	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -85,7 +86,7 @@ public class FiResistActivity extends Activity {
 		firefighterName = settings.getString("FIREFIGHTER_NAME", null);
 		if (firefighterName == null) {
 			// Launch initial wizard
-			createNameDialog();
+			setName();
 		}
 		else {
 			nameTextView.setText(firefighterName);
@@ -233,9 +234,9 @@ public class FiResistActivity extends Activity {
 
 
 	/**
-	  * Creates a prompt for name
+	  * Prompts for and sets name
 	  */
-	private void createNameDialog() {
+	private void setName() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Enter your name");
 		final EditText input = new EditText(this);
@@ -269,8 +270,13 @@ public class FiResistActivity extends Activity {
 					}
 				}
 			});
+	}
 
-
+	/**
+	  * Click Listener wrapper for name
+	  */
+	public void setName(View v) {
+		setName();
 	}
 
 
