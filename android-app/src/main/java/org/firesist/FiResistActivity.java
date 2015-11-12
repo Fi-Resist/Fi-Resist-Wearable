@@ -59,7 +59,7 @@ public class FiResistActivity extends Activity {
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
 	private final int INTERVAL = 1000;
-	private EditText nameInput;
+	private TextView nameTextView;
 	private String firefighterName;
 	FiConnectedListener connectedListener;
 	BTClient btClient;
@@ -72,15 +72,14 @@ public class FiResistActivity extends Activity {
 	private final int SKIN_TEMPERATURE = 0x102;
 	private final int POSTURE = 0x103;
 	private final int PEAK_ACCLERATION = 0x104;
-	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.firesist_layout);
-		nameInput = (EditText) findViewById(R.id.edit_name);
 		this.settings = getPreferences(MODE_PRIVATE);
 
+		nameTextView = (TextView) findViewById(R.id.firefighter_name);
 
 		// Set the firefighter name if it's been done before
 		firefighterName = settings.getString("FIREFIGHTER_NAME", null);
@@ -88,6 +87,7 @@ public class FiResistActivity extends Activity {
 			// Launch initial wizard
 			createNameDialog();
 		}
+
 
 		// Initialize socket connection
 		FiSocketHandler.getInstance()
@@ -132,14 +132,6 @@ public class FiResistActivity extends Activity {
 	 * Starts monitoring devices on an interval
 	 */
 	public void startAlarm(View view) {
-		String name = nameInput.getText()
-			.toString()
-			.trim();
-
-		if (name.isEmpty()) {
-			Toast.makeText(this, "Please input a name", Toast.LENGTH_SHORT).show();
-		}
-		else {
 
 			String BhMacID = "00:07:80:9D:8A:E8";
 			adapter = BluetoothAdapter.getDefaultAdapter();
@@ -169,8 +161,6 @@ public class FiResistActivity extends Activity {
 			btClient.addConnectedEventListener(connectedListener);
 
 			FiSocketHandler.getInstance()
-				.setName(name);
-			FiSocketHandler.getInstance()
 				.connect();
 
 			//Vibrate indicating connection success
@@ -179,7 +169,6 @@ public class FiResistActivity extends Activity {
 
 			manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
-		}
 	}
 
 	/**
@@ -245,7 +234,7 @@ public class FiResistActivity extends Activity {
 	  */
 	private void createNameDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Set Name");
+		builder.setTitle("Enter your name");
 		final EditText input = new EditText(this);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		builder.setView(input);
@@ -254,6 +243,12 @@ public class FiResistActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				firefighterName = input.getText().toString();
+				//Set the text view
+				nameTextView.setText(firefighterName);
+
+				//Set the firefighter name for the socket
+				FiSocketHandler.getInstance()
+					.setName(firefighterName);
 			}
 		});
 
