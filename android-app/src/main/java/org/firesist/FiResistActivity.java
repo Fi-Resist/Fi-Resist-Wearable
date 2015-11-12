@@ -242,17 +242,30 @@ public class FiResistActivity extends Activity {
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				firefighterName = input.getText().toString();
-				//Set the text view
-				nameTextView.setText(firefighterName);
-
-				//Set the firefighter name for the socket
-				FiSocketHandler.getInstance()
-					.setName(firefighterName);
+				//This gets overriden below (to add a close condition)
+				// (Dialogs w/ conditions are funky)
 			}
 		});
 
-		builder.show();
+		final AlertDialog dialog = builder.create();
+		dialog.show();
+		dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+			.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					firefighterName = input.getText().toString().trim();
+							//Set the text view
+					if (!firefighterName.isEmpty()) {
+						nameTextView.setText(firefighterName);
+								//Set the firefighter name for the socket
+
+						FiSocketHandler.getInstance()
+							.setName(firefighterName);
+						//Close the dialog
+						dialog.dismiss();
+					}
+				}
+			});
 
 
 	}
