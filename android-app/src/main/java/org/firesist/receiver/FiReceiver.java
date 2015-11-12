@@ -41,13 +41,12 @@ public class FiReceiver extends BroadcastReceiver {
 
 		try{
 			json = accel.readAccelerometer();
-		
+			// send data through websocket
+			FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
 		} catch(JSONException e) {
 			e.printStackTrace();	
 		}
 
-		// send data through websocket
-		FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
 	}
 }
 
