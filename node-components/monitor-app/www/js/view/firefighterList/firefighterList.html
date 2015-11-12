@@ -1,11 +1,19 @@
-<ion-view view-title="Overview">
+<ion-view view-title="Active Firefighters">
 	<ion-content>
-		<h1>Active Firefighters</h1>
 		<ion-list>
 			<ion-item ng-repeat="firefighter in firefighters"
 				ui-sref="app.firefighterDetail({id:firefighter.id})"
 				ng-class="{'item-assertive': isInDanger(firefighter)}">
-			{{ firefighter.bio.name}} 
+				<div class="row">
+					<div class="col">
+						{{firefighter.bio.name}}
+					</div>
+					<div class="col col-offset-33">
+						<i class="icon ion-ios-heart-outline"></i> {{firefighter.bio.bpm}} BPM
+						<i class="icon ion-ios-cloud-outline"></i> {{firefighter.bio.resp}} 
+					</div>
+				</div>
+
 			</ion-item>
 		</ion-list>
 	</ion-content>
