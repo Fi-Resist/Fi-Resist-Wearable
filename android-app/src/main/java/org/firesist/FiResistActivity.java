@@ -87,6 +87,9 @@ public class FiResistActivity extends Activity {
 			// Launch initial wizard
 			createNameDialog();
 		}
+		else {
+			nameTextView.setText(firefighterName);
+		}
 
 
 		// Initialize socket connection
