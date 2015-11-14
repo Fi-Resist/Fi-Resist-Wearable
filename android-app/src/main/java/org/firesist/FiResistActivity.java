@@ -148,16 +148,13 @@ public class FiResistActivity extends Activity {
 				{
 					if (device.getName().startsWith("BH"))
 					{
-					BluetoothDevice btDevice = device;
-					BhMacID = btDevice.getAddress();
-					break;
+						BluetoothDevice btDevice = device;
+						BhMacID = btDevice.getAddress();
+						break;
 					}
 				}
-						
-						
 			}
 						
-			//BhMacID = btDevice.getAddress();
 			BluetoothDevice Device = adapter.getRemoteDevice(BhMacID);
 			String DeviceName = Device.getName();
 			btClient = new BTClient(adapter, BhMacID);
@@ -166,6 +163,13 @@ public class FiResistActivity extends Activity {
 
 			FiSocketHandler.getInstance()
 				.connect();
+
+
+			// Start up the BioHarness client
+			if (btClient.IsConnected()) {
+				btClient.start();
+			}
+
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
@@ -187,6 +191,12 @@ public class FiResistActivity extends Activity {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+
+			// Disconnect bioharness
+			btClient.removeConnectedEventListener(connectedListener);
+			btClient.Close();
+
+
 			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
 		}
 	}

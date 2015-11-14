@@ -22,11 +22,9 @@ public class FiReceiver extends BroadcastReceiver {
 
     private final String UPDATE_BIOMETRICS = "update-biometrics";
     private final String UPDATE_POSITION = "update-position";
-    private final AccelerometerReader accel;
-    private Context context;
+    private AccelerometerReader accel;
 
     public FiReceiver() {
-    	accel = new AccelerometerReader(context.getApplicationContext());
     }
 
 	/**
@@ -36,6 +34,10 @@ public class FiReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		// read data from devices here...
 		System.out.println("Running receiver...");
+
+		if (accel == null) {
+	    	accel = new AccelerometerReader(context.getApplicationContext());
+		}
 
 		JSONObject json = new JSONObject();
 
