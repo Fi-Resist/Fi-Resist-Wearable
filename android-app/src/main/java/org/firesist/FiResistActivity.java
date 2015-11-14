@@ -1,6 +1,5 @@
 package org.firesist;
 
-import zephyr.android.BioHarnessBT.*;
 
 import android.app.Activity;
 import android.os.Vibrator;
@@ -19,11 +18,10 @@ import java.net.URISyntaxException;
 import org.json.JSONException;
 import org.firesist.receiver.FiReceiver;
 import org.firesist.sockethandler.FiSocketHandler;
-import org.firesist.connectedlistener.FiConnectedListener;
+import org.firesist.biometric.BiometricReader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Set;
 
 import android.R.*;
 import android.bluetooth.*;
@@ -58,20 +56,11 @@ public class FiResistActivity extends Activity {
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
 	private AlarmManager manager;
+	private BiometricReader biometricReader;
 	private final int INTERVAL = 1000;
 	private TextView nameTextView;
 	private String firefighterName;
-	FiConnectedListener connectedListener;
-	BTClient btClient;
 	
-	BluetoothAdapter adapter = null;
-	ZephyrProtocol _protocol;
-	private final int HEART_RATE = 0x100;
-	private final int RESPIRATION_RATE = 0x101;
-	private final int SKIN_TEMPERATURE = 0x102;
-	private final int POSTURE = 0x103;
-	private final int PEAK_ACCLERATION = 0x104;
-
 
 	/** Called when the activity is first created. */
 	@Override
@@ -92,6 +81,9 @@ public class FiResistActivity extends Activity {
 			nameTextView.setText(firefighterName);
 		}
 
+		//initialize biometric reader
+		biometricReader = new BiometricReader();
+
 
 		// Initialize socket connection
 		FiSocketHandler.getInstance()
@@ -101,13 +93,6 @@ public class FiResistActivity extends Activity {
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
 		
-		/*Sending a message to android that we are going to initiate a pairing request*/
-		IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
-		/*Registering a new BTBroadcast receiver from the Main Activity context with pairing request event*/
-		this.getApplicationContext().registerReceiver(new BTBroadcastReceiver(), filter);
-		// Registering the BTBondReceiver in the application that the status of the receiver has changed to Paired
-		IntentFilter filter2 = new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED");
-		this.getApplicationContext().registerReceiver(new BTBondReceiver(), filter2);
 	}
 
 
@@ -137,39 +122,14 @@ public class FiResistActivity extends Activity {
 	 */
 	public void startAlarm(View view) {
 
-			String BhMacID = "00:07:80:9D:8A:E8";
-			adapter = BluetoothAdapter.getDefaultAdapter();
-						
-			Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
-						
-			if (pairedDevices.size() > 0)
-			{
-				for (BluetoothDevice device : pairedDevices)
-				{
-					if (device.getName().startsWith("BH"))
-					{
-						BluetoothDevice btDevice = device;
-						BhMacID = btDevice.getAddress();
-						break;
-					}
-				}
-			}
-						
-			BluetoothDevice Device = adapter.getRemoteDevice(BhMacID);
-			String DeviceName = Device.getName();
-			btClient = new BTClient(adapter, BhMacID);
-			connectedListener= new FiConnectedListener(null);
-			btClient.addConnectedEventListener(connectedListener);
-
 			FiSocketHandler.getInstance()
 				.connect();
 
-
-			// Start up the BioHarness client
-			if (btClient.IsConnected()) {
-				btClient.start();
+			try {
+				biometricReader.startReading();
+			} catch (RuntimeException e) {
+				Toast.makeText(this, "No BioHarness found", Toast.LENGTH_SHORT).show();
 			}
-
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
@@ -183,6 +143,8 @@ public class FiResistActivity extends Activity {
 	 * Turns off monitor, disconnects socket
 	 */
 	public void cancelAlarm(View view) {
+		biometricReader.stopReading();
+
 		if (manager != null) {
 			manager.cancel(pendingIntent);
 			try {
@@ -192,57 +154,11 @@ public class FiResistActivity extends Activity {
 				e.printStackTrace();
 			}
 
-			// Disconnect bioharness
-			btClient.removeConnectedEventListener(connectedListener);
-			btClient.Close();
-
 
 			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
-	private class BTBondReceiver extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Bundle b = intent.getExtras();
-			BluetoothDevice device = adapter.getRemoteDevice(b.get("android.bluetooth.device.extra.DEVICE").toString());
-			Log.d("Bond state", "BOND_STATED = " + device.getBondState());
-		}
-	}
-	private class BTBroadcastReceiver extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d("BTIntent", intent.getAction());
-			Bundle b = intent.getExtras();
-			Log.d("BTIntent", b.get("android.bluetooth.device.extra.DEVICE").toString());
-			Log.d("BTIntent", b.get("android.bluetooth.device.extra.PAIRING_VARIANT").toString());
-			try {
-				BluetoothDevice device = adapter.getRemoteDevice(b.get("android.bluetooth.device.extra.DEVICE").toString());
-				Method m = BluetoothDevice.class.getMethod("convertPinToBytes", new Class[] {String.class} );
-				byte[] pin = (byte[])m.invoke(device, "1234");
-				m = device.getClass().getMethod("setPin", new Class [] {pin.getClass()});
-				Object result = m.invoke(device, pin);
-				Log.d("BTTest", result.toString());
-			} catch (SecurityException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (NoSuchMethodException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
-
 	/**
 	  * Prompts for and sets name
 	  */
