@@ -191,6 +191,12 @@ public class FiResistActivity extends Activity {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+
+			// Disconnect bioharness
+			btClient.removeConnectedEventListener(connectedListener);
+			btClient.Close();
+
+
 			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
 		}
 	}
