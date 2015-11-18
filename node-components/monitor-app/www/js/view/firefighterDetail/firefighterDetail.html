@@ -1,6 +1,9 @@
 <ion-view view-title="Detail">
 	<ion-content>
-		<h3>{{firefighter.name}}</h3>
+		<div class="details">
+			<img src="img/{{firefighter.pic}}" width="100" height="100"/>
+			<h4>{{firefighter.name}}</h4>
+		</div>
 		<ion-list>
 			<ion-item><i class="icon ion-ios-heart-outline"></i> {{firefighter.bio.bpm}} BPM</ion-item>
 			<ion-item><i class="icon ion-ios-cloud-outline"></i> {{firefighter.bio.resp}}</ion-item>
