@@ -1,6 +1,5 @@
 package org.firesist;
 
-
 import android.app.Activity;
 import android.os.Vibrator;
 import android.os.Bundle;
@@ -50,18 +49,31 @@ import android.text.InputType;
 
 import org.json.JSONObject;
 
-public class FiResistActivity extends Activity {
+import com.goatstone.util.SensorFusion;
+import java.text.DecimalFormat;
+
+public class FiResistActivity extends Activity 
+	implements SensorEventListener, RadioGroup.OnCheckedChangeListener{
 	
 	private SharedPreferences settings;
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
+	private SensorFusion sensorFusion;
+	private SensorManager sensorManager = null;
 	private AlarmManager manager;
 	private BiometricReader biometricReader;
 	private final int INTERVAL = 1000;
 	private TextView nameTextView;
+	private TextView azimuthText, pithText, rollText;
 	private String firefighterName;
-	
 
+	private DecimalFormat d = new DecimalFormat("#.##");
+	private RadioGroup setModeRadioGroup;
+
+
+
+	//TODO: Move SensorFusion Data to appropriate Receiver and display/approximate movement on map
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -81,10 +93,25 @@ public class FiResistActivity extends Activity {
 			nameTextView.setText(firefighterName);
 		}
 
+		//Get Sensor Service and register listeners
+		sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+		registerSensorManagerListeners();
+
+		d.setMaximumFractionDigits(2);
+		d.setMinimumFractionDigits(2);
+
+		sensorFusion = new SensorFusion();
+		sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
+
+		setModeRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
+		azimuthText = (TextView) findViewById(R.id.azmuth);
+		pithText = (TextView) findViewById(R.id.pitch);
+		rollText = (TextView) findViewById(R.id.roll);
+		setModeRadioGroup.setOnCheckedChangeListener(this);
+
 		//initialize biometric reader
 		biometricReader = new BiometricReader();
-
-
+		
 		// Initialize socket connection
 		FiSocketHandler.getInstance()
 			.initSocket(getString(R.string.host));
@@ -95,10 +122,37 @@ public class FiResistActivity extends Activity {
 		
 	}
 
+	//Get sensor values and update view
+	public void updateOrientationDisplay() {
+
+       		double azimuthValue = sensorFusion.getAzimuth();
+        	double rollValue =  sensorFusion.getRoll();
+        	double pitchValue =  sensorFusion.getPitch();
+
+        	azimuthText.setText(String.valueOf(d.format(azimuthValue)));
+        	pithText.setText(String.valueOf(d.format(pitchValue)));
+        	rollText.setText(String.valueOf(d.format(rollValue)));
+    	}
+
+	//Register listeners for all sensors
+	public void registerSensorManagerListeners() {
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+   	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
+		sensorManager.unregisterListener(this);
 
 		// Save firefighter name
 		SharedPreferences.Editor editor = this.settings.edit();
@@ -116,6 +170,60 @@ public class FiResistActivity extends Activity {
 			e.printStackTrace();
 		}
 	}
+
+	//New
+	@Override
+	public void onPause() {
+		super.onPause();
+		sensorManager.unregisterListener(this);
+	}
+
+    	@Override
+    	public void onResume() {
+    	    super.onResume();
+        	registerSensorManagerListeners();
+    	}
+
+    	@Override
+    		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    	}
+
+	@Override
+    	public void onSensorChanged(SensorEvent event) {
+		//Update all sensors to current hardware readings
+        	switch (event.sensor.getType()) {
+            	case Sensor.TYPE_ACCELEROMETER:
+                	sensorFusion.setAccel(event.values);
+                	sensorFusion.calculateAccMagOrientation();
+                	break;
+
+            	case Sensor.TYPE_GYROSCOPE:
+                	sensorFusion.gyroFunction(event);
+                	break;
+
+            	case Sensor.TYPE_MAGNETIC_FIELD:
+                	sensorFusion.setMagnet(event.values);
+               	 	break;
+        	}
+        	updateOrientationDisplay();
+    	}
+
+	@Override
+    	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		//Show Selected mode values only
+        	switch (checkedId) {
+            	case R.id.radio0:
+                	sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
+                	break;
+            	case R.id.radio1:
+                	sensorFusion.setMode(SensorFusion.Mode.GYRO);
+                	break;
+            	case R.id.radio2:
+                	sensorFusion.setMode(SensorFusion.Mode.FUSION);
+                	break;
+        	}
+    	}
+	//
 
 	/**
 	 * Starts monitoring devices on an interval
