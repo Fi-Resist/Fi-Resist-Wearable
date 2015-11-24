@@ -58,8 +58,13 @@ angular.module("app.services")
 		}
 
 		var findimagebyID = function(id) {
-			var avatar = firefighteravatars[id];
-			return avatar
+			if (id) {
+				var avatar = firefighteravatars[id];
+				return avatar
+			}
+			else
+				return null;
+			
 		}
 
 		return {
