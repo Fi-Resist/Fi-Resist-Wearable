@@ -73,6 +73,6 @@ angular.module("app.services")
 			create: create,
 			initFirefighterArray: initFirefighterArray,
 			remove: remove,
-			findimagebyID; findimagebyID
+			/*findimagebyID; findimagebyID*/
 		};
 	});
