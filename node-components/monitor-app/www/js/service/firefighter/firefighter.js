@@ -4,7 +4,7 @@ angular.module("app.services")
 	.factory("firefighters", function($rootScope, event) {
 		var firefighters = [];
 
-		var firefighteravatars = [
+/*		var firefighteravatars = [
 			{"id": 1, "pic": "F1.jpg"}
 			{"id": 2, "pic": "F2.jpg"}
 			{"id": 3, "pic": "F3.jpg"}
@@ -12,8 +12,8 @@ angular.module("app.services")
 			{"id": 5, "pic": "F5.jpg"}
 			{"id": 6, "pic": "F6.jpg"}
 			{"id": 7, "pic": "F7.jpg"}
-		]
-
+		];
+*/
 		var get = function(id) {
 			if (id) {
 				for (var i = 0; i < firefighters.length; i++) {
@@ -55,8 +55,8 @@ angular.module("app.services")
 			else {
 				firefighters = [];
 			}
-		}
-
+		};
+/*
 		var findimagebyID = function(id) {
 			if (id) {
 				var avatar = firefighteravatars[id];
@@ -65,8 +65,8 @@ angular.module("app.services")
 			else
 				return null;
 			
-		}
-
+		};
+*/
 		return {
 			get: get,
 			update: update,
