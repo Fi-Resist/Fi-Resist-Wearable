@@ -28,7 +28,9 @@ var FireFighter = new Schema({
 // Deployment location + list of firefighters
 var Deployment = new Schema({
 	location: String,
-	firefighters: [Number]
+	firefighters: [Number],
+	timestarted: Date,
+	timeEnded: Date
 });
 
 
