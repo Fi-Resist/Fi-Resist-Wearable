@@ -1,7 +1,5 @@
 package org.firesist;
 
-import zephyr.android.BioHarnessBT.*;
-
 import android.app.Activity;
 import android.os.Vibrator;
 import android.os.Bundle;
@@ -19,10 +17,10 @@ import java.net.URISyntaxException;
 import org.json.JSONException;
 import org.firesist.receiver.FiReceiver;
 import org.firesist.sockethandler.FiSocketHandler;
+import org.firesist.biometric.BiometricReader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Set;
 
 import android.R.*;
 import android.bluetooth.*;
@@ -39,105 +37,129 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
-public class FiResistActivity extends Activity {
+import android.content.SharedPreferences;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
+
+import org.json.JSONObject;
+
+import com.goatstone.util.SensorFusion;
+import java.text.DecimalFormat;
+
+public class FiResistActivity extends Activity 
+	implements SensorEventListener, RadioGroup.OnCheckedChangeListener{
+	
+	private SharedPreferences settings;
 	private FiReceiver receiver;
 	private PendingIntent pendingIntent;
+	private SensorFusion sensorFusion;
+	private SensorManager sensorManager = null;
 	private AlarmManager manager;
+	private BiometricReader biometricReader;
 	private final int INTERVAL = 1000;
-	private EditText nameInput;
-    
-    /** Called when the activity is first created. */
-    BluetoothAdapter adapter = null;
-    BTClient _bt;
-    ZephyrProtocol _protocol;
-    //BiometricListener _NConnListener;
-    private final int HEART_RATE = 0x100;
-    private final int RESPIRATION_RATE = 0x101;
-    private final int SKIN_TEMPERATURE = 0x102;
-    private final int POSTURE = 0x103;
-    private final int PEAK_ACCLERATION = 0x104;
-    
+	private TextView nameTextView;
+	private TextView azimuthText, pithText, rollText;
+	private String firefighterName;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+	private DecimalFormat d = new DecimalFormat("#.##");
+	private RadioGroup setModeRadioGroup;
+
+
+
+	//TODO: Move SensorFusion Data to appropriate Receiver and display/approximate movement on map
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.firesist_layout);
-		nameInput = (EditText) findViewById(R.id.edit_name);
+		this.settings = getPreferences(MODE_PRIVATE);
 
+		nameTextView = (TextView) findViewById(R.id.firefighter_name);
 
+		// Set the firefighter name if it's been done before
+		firefighterName = settings.getString("FIREFIGHTER_NAME", null);
+		if (firefighterName == null) {
+			// Launch initial wizard
+			setName();
+		}
+		else {
+			nameTextView.setText(firefighterName);
+		}
+
+		//Get Sensor Service and register listeners
+		sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+		registerSensorManagerListeners();
+
+		d.setMaximumFractionDigits(2);
+		d.setMinimumFractionDigits(2);
+
+		sensorFusion = new SensorFusion();
+		sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
+
+		setModeRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
+		azimuthText = (TextView) findViewById(R.id.azmuth);
+		pithText = (TextView) findViewById(R.id.pitch);
+		rollText = (TextView) findViewById(R.id.roll);
+		setModeRadioGroup.setOnCheckedChangeListener(this);
+
+		//initialize biometric reader
+		biometricReader = new BiometricReader();
+		
+		// Initialize socket connection
 		FiSocketHandler.getInstance()
 			.initSocket(getString(R.string.host));
 
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
-        
-            /*Sending a message to android that we are going to initiate a pairing request*/
-            //IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
-            /*Registering a new BTBroadcast receiver from the Main Activity context with pairing request event*/
-            //this.getApplicationContext().registerReceiver(new BTBroadcastReceiver(), filter);
-            // Registering the BTBondReceiver in the application that the status of the receiver has changed to Paired
-           /* IntentFilter filter2 = new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED");
-            this.getApplicationContext().registerReceiver(new BTBondReceiver(), filter2);
-        
-            
-            Button btnConnect = (Button) findViewById(R.id.ButtonConnect);
-            if (btnConnect != null)
-            {
-                btnConnect.setOnClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        String BhMacID = "00:07:80:9D:8A:E8";
-                        adapter = BluetoothAdapter.getDefaultAdapter();
-                        
-                        Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
-                        
-                        if (pairedDevices.size() > 0)
-                        {
-                            for (BluetoothDevice device : pairedDevices)
-                            {
-                                if (device.getName().startsWith("BH"))
-                                {
-                                    BluetoothDevice btDevice = device;
-                                    BhMacID = btDevice.getAddress();
-                                    break;
-                                    
-                                }
-                            }
-                            
-                            
-                        }
-                        
-                        //BhMacID = btDevice.getAddress();
-                        BluetoothDevice Device = adapter.getRemoteDevice(BhMacID);
-                        String DeviceName = Device.getName();
-                        _bt = new BTClient(adapter, BhMacID);
-                        _NConnListener = new BiometricListener(Newhandler,Newhandler);
-                        _bt.addConnectedEventListener(_NConnListener);
-                        
-                        TextView tv1 = (EditText)findViewById(R.id.labelHeartRate);
-                        tv1.setText("000");
-                        
-                        tv1 = (EditText)findViewById(R.id.labelRespRate);
-                        tv1.setText("0.0");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelSkinTemp);
-                        tv1.setText("0.0");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelPosture);
-                        tv1.setText("000");
-                        
-                        tv1 = 	(EditText)findViewById(R.id.labelPeakAcc);
-                        tv1.setText("0.0");
-                    }
-                });
-            }*/
-    }
+		
+	}
+
+	//Get sensor values and update view
+	public void updateOrientationDisplay() {
+
+       		double azimuthValue = sensorFusion.getAzimuth();
+        	double rollValue =  sensorFusion.getRoll();
+        	double pitchValue =  sensorFusion.getPitch();
+
+        	azimuthText.setText(String.valueOf(d.format(azimuthValue)));
+        	pithText.setText(String.valueOf(d.format(pitchValue)));
+        	rollText.setText(String.valueOf(d.format(rollValue)));
+    	}
+
+	//Register listeners for all sensors
+	public void registerSensorManagerListeners() {
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+
+        	sensorManager.registerListener(this,
+                	sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                	SensorManager.SENSOR_DELAY_FASTEST);
+   	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onStop() {
+		super.onStop();
+		sensorManager.unregisterListener(this);
 
+		// Save firefighter name
+		SharedPreferences.Editor editor = this.settings.edit();
+		editor.putString("FIREFIGHTER_NAME", firefighterName);
+		editor.commit();
+
+		// Disconnect Socket
 		if (manager != null) {
 			manager.cancel(pendingIntent);
 		}
@@ -149,23 +171,73 @@ public class FiResistActivity extends Activity {
 		}
 	}
 
+	//New
+	@Override
+	public void onPause() {
+		super.onPause();
+		sensorManager.unregisterListener(this);
+	}
+
+    	@Override
+    	public void onResume() {
+    	    super.onResume();
+        	registerSensorManagerListeners();
+    	}
+
+    	@Override
+    		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    	}
+
+	@Override
+    	public void onSensorChanged(SensorEvent event) {
+		//Update all sensors to current hardware readings
+        	switch (event.sensor.getType()) {
+            	case Sensor.TYPE_ACCELEROMETER:
+                	sensorFusion.setAccel(event.values);
+                	sensorFusion.calculateAccMagOrientation();
+                	break;
+
+            	case Sensor.TYPE_GYROSCOPE:
+                	sensorFusion.gyroFunction(event);
+                	break;
+
+            	case Sensor.TYPE_MAGNETIC_FIELD:
+                	sensorFusion.setMagnet(event.values);
+               	 	break;
+        	}
+        	updateOrientationDisplay();
+    	}
+
+	@Override
+    	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		//Show Selected mode values only
+        	switch (checkedId) {
+            	case R.id.radio0:
+                	sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
+                	break;
+            	case R.id.radio1:
+                	sensorFusion.setMode(SensorFusion.Mode.GYRO);
+                	break;
+            	case R.id.radio2:
+                	sensorFusion.setMode(SensorFusion.Mode.FUSION);
+                	break;
+        	}
+    	}
+	//
+
 	/**
 	 * Starts monitoring devices on an interval
 	 */
 	public void startAlarm(View view) {
-		String name = nameInput.getText()
-			.toString()
-			.trim();
 
-		if (name.isEmpty()) {
-			Toast.makeText(this, "Please input a name", Toast.LENGTH_SHORT).show();
-		}
-		else {
-
-			FiSocketHandler.getInstance()
-				.setName(name);
 			FiSocketHandler.getInstance()
 				.connect();
+
+			try {
+				biometricReader.startReading();
+			} catch (RuntimeException e) {
+				Toast.makeText(this, "No BioHarness found", Toast.LENGTH_SHORT).show();
+			}
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
@@ -173,13 +245,14 @@ public class FiResistActivity extends Activity {
 
 			manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
-		}
 	}
 
 	/**
 	 * Turns off monitor, disconnects socket
 	 */
 	public void cancelAlarm(View view) {
+		biometricReader.stopReading();
+
 		if (manager != null) {
 			manager.cancel(pendingIntent);
 			try {
@@ -188,50 +261,57 @@ public class FiResistActivity extends Activity {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+
+
 			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
 		}
 	}
-    
-    private class BTBondReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle b = intent.getExtras();
-            BluetoothDevice device = adapter.getRemoteDevice(b.get("android.bluetooth.device.extra.DEVICE").toString());
-            Log.d("Bond state", "BOND_STATED = " + device.getBondState());
-        }
-    }
-    private class BTBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("BTIntent", intent.getAction());
-            Bundle b = intent.getExtras();
-            Log.d("BTIntent", b.get("android.bluetooth.device.extra.DEVICE").toString());
-            Log.d("BTIntent", b.get("android.bluetooth.device.extra.PAIRING_VARIANT").toString());
-            try {
-                BluetoothDevice device = adapter.getRemoteDevice(b.get("android.bluetooth.device.extra.DEVICE").toString());
-                Method m = BluetoothDevice.class.getMethod("convertPinToBytes", new Class[] {String.class} );
-                byte[] pin = (byte[])m.invoke(device, "1234");
-                m = device.getClass().getMethod("setPin", new Class [] {pin.getClass()});
-                Object result = m.invoke(device, pin);
-                Log.d("BTTest", result.toString());
-            } catch (SecurityException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            } catch (NoSuchMethodException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
+	
+	/**
+	  * Prompts for and sets name
+	  */
+	private void setName() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Enter your name");
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		builder.setView(input);
+
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				//This gets overriden below (to add a close condition)
+				// (Dialogs w/ conditions are funky)
+			}
+		});
+
+		final AlertDialog dialog = builder.create();
+		dialog.show();
+		dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+			.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					firefighterName = input.getText().toString().trim();
+							//Set the text view
+					if (!firefighterName.isEmpty()) {
+						nameTextView.setText(firefighterName);
+								//Set the firefighter name for the socket
+
+						FiSocketHandler.getInstance()
+							.setName(firefighterName);
+						//Close the dialog
+						dialog.dismiss();
+					}
+				}
+			});
+	}
+
+	/**
+	  * Click Listener wrapper for name
+	  */
+	public void setName(View v) {
+		setName();
+	}
 
 
 }

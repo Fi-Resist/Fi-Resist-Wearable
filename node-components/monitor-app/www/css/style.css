@@ -1,12 +1,20 @@
 /* Empty. Add your own CSS if you like */
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> master
 .ionic-logo {
   display: block;
   margin: 15px auto;
   width: 96px;
   height: 96px;
 }
+<<<<<<< HEAD
 */
+=======
+
+>>>>>>> master
 .details {
     padding: 0px 12px 20px 12px;
 }
@@ -16,8 +24,14 @@
     margin-right: 12px;
 }
 
+<<<<<<< HEAD
 /*
 .list {
     clear: both;
 }
 */
+=======
+.list {
+    clear: both;
+}
+>>>>>>> master

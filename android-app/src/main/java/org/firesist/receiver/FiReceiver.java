@@ -1,10 +1,10 @@
 package org.firesist.receiver;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import org.firesist.sockethandler.FiSocketHandler;
+import org.firesist.position.AccelerometerReader;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,7 +12,7 @@ import android.os.Message;
 import android.widget.TextView;
 import zephyr.android.BioHarnessBT.*;
 
-import org.json.JSONObject;
+import org.json.*;
 
 
 /**
@@ -22,7 +22,8 @@ public class FiReceiver extends BroadcastReceiver {
 
     private final String UPDATE_BIOMETRICS = "update-biometrics";
     private final String UPDATE_POSITION = "update-position";
-    
+    private AccelerometerReader accel;
+
     public FiReceiver() {
     }
 
@@ -34,10 +35,19 @@ public class FiReceiver extends BroadcastReceiver {
 		// read data from devices here...
 		System.out.println("Running receiver...");
 
-		// send data through websocket
-		//FiSocketHandler.getInstance()
-//			.sendUpdate(data);
+		if (accel == null) {
+	    	accel = new AccelerometerReader(context.getApplicationContext());
+		}
 
+		JSONObject json = new JSONObject();
+
+		try{
+			json = accel.readAccelerometer();
+			// send data through websocket
+			FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
+		} catch(JSONException e) {
+			e.printStackTrace();	
+		}
 
 	}
 }
