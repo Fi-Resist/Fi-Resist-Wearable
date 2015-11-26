@@ -1,85 +1,38 @@
-var express = require("express");
-var app = express();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
+var express       = require("express");
+var app           = express();
+var http          = require("http").Server(app);
+var io            = require("socket.io")(http);
+var bodyParser    = require("body-parser");
 var socketHandler = require("./socketHandler/socketHandler");
-var SOCKET_EVT = require("./constant/constant").socket;
-var FIREFIGHTERS = [];
-var _ = require("lodash");
+var cookieParser  = require("cookie-parser");
+var session       = require("cookie-session");
 
+var mongoose = require("mongoose");
+var passport = require("passport");
+var LocalStrategy = require("passport-local").Strategy;
 
 
 app.use(express.static("server/static"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(session({keys: ["secretkey"]}));
 
-app.get("/", function(req, res) {
-	res.sendFile(__dirname + "/static/index.html");
-});
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.post("/post", function(req, res) {
-	console.log("POST!");
-	console.log(req);
-});
+//Configure auth handlers
+var Account = require("./model/model").Account;
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
 
-io.on("connection", function(socket) {
-	console.log("a user connected");
+//initialize socket.io handler
+socketHandler.initialize(io);
 
-	// receive a new firefighter
-	socket.on(SOCKET_EVT.receive.NEW, function(msg) {
-		console.log("New Event received");
-		console.log(msg);
+//register routes
+app.use("/", require("./routes/index"));
 
-		/**
-		 * Firefighter object:
-		 *  id: unique identifier
-		 * 	bio: Object containing name & biometric data
-		 *  position: array of data points showing movement history
-		 */
-		var newFirefighter = {
-			id: msg.id,
-			bio: _.omit(msg, "id"),
-			position: []
-		};
-		FIREFIGHTERS.push(newFirefighter);
-		console.log(FIREFIGHTERS);
-		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
-	});
-
-	//update a firefighter's biometrics
-	socket.on(SOCKET_EVT.receive.UPDATE_BIOMETRICS, function(msg) {
-		console.log("Biometrics update");
-		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
-		FIREFIGHTERS[index].bio = msg;
-		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
-	});
-
-	//update a firefighters position
-	socket.on(SOCKET_EVT.receive.UPDATE_POSITION, function(msg) {
-		console.log("Position Update");
-		var index = _.findIndex(FIREFIGHTERS, {id: msg.id});
-
-		//Firefighters position is an array of data points
-		FIREFIGHTERS[index].position.push(msg);
-		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
-	});
-
-	//Firefighter disconnects app
-	socket.on(SOCKET_EVT.receive.DELETE, function(msg) {
-		console.log("Delete request received");
-		_.remove(FIREFIGHTERS, function(firefighter) {
-			return firefighter.id == msg.id;
-		});
-		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
-		console.log(FIREFIGHTERS);
-	});
-
-	// Chief requests info
-	socket.on(SOCKET_EVT.receive.REQUEST_INFO, function(msg) {
-		console.log(FIREFIGHTERS);
-		socketHandler.emitData(io, FIREFIGHTERS, SOCKET_EVT.send.UPDATE);
-	});
-
-
-});
 
 var port = process.env.PORT || 3000
 
