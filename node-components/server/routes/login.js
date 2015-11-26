@@ -5,7 +5,7 @@ module.exports = {
 	get: function(req, res) {
 		res.sendFile("login.html");
 	},
-	post: functoin(req, res) {
+	post: function(req, res) {
 		res.redirect("/");
 	}
 };
