@@ -1,0 +1,41 @@
+/*
+Base:
+
+#FCF7F8
+#CED3DC
+#ABA9C3
+#275DAD
+#5B616A
+
+*/
+
+
+html, body {
+	background-color: #044389;
+	color: #fff;
+}
+
+.toolbar {
+	position: absolute;
+	top:0;
+	width: 100%;
+	text-align: right;
+	right:10px;
+}
+
+
+a, a:visited {
+	color: #fff;
+}
+
+a:hover {
+	opacity: 0.5;
+}
+
+a.add-btn {
+	padding-top:2px;
+	opacity: 0.5;
+}
+
+
+

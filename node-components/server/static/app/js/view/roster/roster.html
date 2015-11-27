@@ -1,0 +1,25 @@
+<div>
+	<h1>Current Firefighters</h1>
+	<div ng-show="firefighters.length">
+		<p>Supply the key to the appropriate firefighter to log into the Fi-Resist monitoring application</p>
+		<table class="table"> 
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Key</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="firefighter in firefighters">
+					<td>{{firefighter.name}}</td>
+					<td>{{firefighter.key}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<form ng-submit="submit()">
+		<input type="text" class="form-control" ng-model="newFirefighter" required>
+		<button type="submit">Submit</button>
+	</form>
+</div>

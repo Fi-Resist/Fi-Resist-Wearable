@@ -1,0 +1,11 @@
+<div>
+	<h1>Past Deployments</h1>
+	<div ng-show="deployments.length">
+		<div ng-repeat="deployment in deployments">
+			{{ deployment.name }}
+		</div>
+	</div>
+	<div ng-hide="deployments.length">
+		No deployments yet!
+	</div>
+</div>

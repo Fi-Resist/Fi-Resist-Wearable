@@ -2,17 +2,26 @@
 <html lang="en">
 	<head>
 		<title>Fi-Resist</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+		<link rel="stylesheet" href="app/style.css">
+		<meta name="viewport" content="width=device-width, intial-scale=1">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
+		<script src="app/js/bootstrap.js"></script>
+		<script src="app/js/app.js"></script>
+		<script src="app/js/service/index.js"></script>
+		<script src="app/js/service/firefighter.js"></script>
+		<script src="app/js/service/deployment.js"></script>
+		<script src="app/js/view/index.js"></script>
+		<script src="app/js/view/deployment/deployment.js"></script>
+		<script src="app/js/view/roster/roster.js"></script>
+		<script src="app/js/view/home/home.js"></script>
+		<script src="app/js/view/toolbar/toolbar.js"></script>
 	</head>
 	<body>
-		<!-- List of current firefighters (by department) -->
-		<div>
-			<h2>Current Firefighters</h2>
-		</div>
-
-		<!-- List of past deployments (for department) -->
-		<div>
-			<h2>Past Deployments</h2>
-		</div>
+		<div ui-view></div>
 	</body>
 </html>
 
