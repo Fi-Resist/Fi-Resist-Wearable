@@ -6,9 +6,8 @@ var bodyParser    = require("body-parser");
 var socketHandler = require("./socketHandler/socketHandler");
 var cookieParser  = require("cookie-parser");
 var session       = require("cookie-session");
-
-var mongoose = require("mongoose");
-var passport = require("passport");
+var mongoose      = require("mongoose");
+var passport      = require("passport");
 var LocalStrategy = require("passport-local").Strategy;
 
 
@@ -32,6 +31,22 @@ socketHandler.initialize(io);
 
 //register routes
 app.use("/", require("./routes/index"));
+
+// Connect to mongodb
+var mongoHost = "mongodb://";
+if (process.env.DB_HOST) {
+	mongoHost += process.env.DB_HOST;
+}
+else {
+	mongoHost = "mongodb://localhost/firesist";
+}
+
+mongoose.connect(mongoHost, function(err) {
+	if (err) {
+		console.log("connection error");
+	}
+});
+
 
 
 var port = process.env.PORT || 3000
