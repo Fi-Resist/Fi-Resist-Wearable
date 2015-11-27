@@ -1,0 +1,9 @@
+html, body {
+	font-family: sans-serif;
+}
+
+
+.content {
+	width: 75%;
+	margin: 0 auto;
+}
