@@ -11,7 +11,7 @@ var passport      = require("passport");
 var LocalStrategy = require("passport-local").Strategy;
 
 
-app.use(express.static("server/static"));
+app.use(express.static("static"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
