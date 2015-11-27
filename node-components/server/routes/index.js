@@ -6,15 +6,17 @@ var register = require("./register");
 var login    = require("./login");
 var router   = require("express").Router();
 var passport = require("passport");
+var path = require("path");
 
 
 router.get("/", function(req, res) {
+	var p = path.resolve(__dirname + "/../static/landing/index.html");
+
 	if (req.user) {
-		res.sendFile("app/index.html");
+		p = path.resolve(__dirname + "/../static/app/index.html");
 	}
-	else {
-		res.sendFile("landing/index.html");
-	}
+
+	res.sendFile(p);
 });
 
 

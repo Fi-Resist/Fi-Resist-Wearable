@@ -2,13 +2,16 @@
  * Routes for registering a new user
  */
 
+var path = require("path");
 var Account = require("../model/model").Account;
 module.exports = {
 	/* get
 	 * renders the new user page
 	 */ 
 	get: function(req, res) {
-		res.sendFile("register.html");
+		var p = path.resolve(__dirname + "/../static/register/index.html");
+		res.sendFile(p);
+
 	},
 
 	/* post
