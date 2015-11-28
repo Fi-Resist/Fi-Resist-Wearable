@@ -8,11 +8,8 @@ angular.module("app", ["ui.router", "ui.bootstrap", "app.services", "app.control
 			templateUrl: "app/js/view/toolbar/toolbar.html",
 			controller: "ToolbarCtrl",
 			resolve: {
-				user: function() {
-					return {
-						name: "Daniel",
-						location: "College Station"
-					};
+				user: function(user) {
+					return user.get();
 				}
 			}
 		})
