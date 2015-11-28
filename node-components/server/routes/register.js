@@ -2,8 +2,11 @@
  * Routes for registering a new user
  */
 
-var path = require("path");
-var Account = require("../model/model").Account;
+var path    = require("path");
+var Model   = require("../model/model");
+var Account = Model.Account;
+var Station = Model.Station;
+
 module.exports = {
 	/* get
 	 * renders the new user page
@@ -19,18 +22,23 @@ module.exports = {
 	 */
 	post: function(req, res, next) {
 		console.log("Registering User");
-		Account.register(new Account({
-			username: req.body.username,
-			name: req.body.name
-		}), req.body.password, function(err) {
-			if (err) {
-				console.log("registration error!");
-				return next(err);
-			}
+
+		Station.findOne({ "stationId": req.body.station}, function(err, station) {
+			Account.register(new Account({
+				username: req.body.username,
+				name: req.body.name,
+				stationRef: station._id
+			}), req.body.password, function(err) {
+				if (err) {
+					console.log("registration error!");
+					return next(err);
+				}
+
+				console.log("Registration successful");
+				res.redirect("/");
+			});
 		});
 
-		console.log("Registration successful");
-		res.redirect("/");
 	}
 };
 

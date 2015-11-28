@@ -9,26 +9,29 @@ var passportLocal = require("passport-local-mongoose");
 // Account for authentication
 var Account = new Schema({
 	name: String,
+	stationRef: Schema.Types.ObjectId
 });
+
 Account.plugin(passportLocal);
 
 // Fire station
 var Station = new Schema({
 	name: String,
-})
+	stationId: String
+});
 
 // Firefighter
 var FireFighter = new Schema({
 	name: String,
 	username: String,
-	stationRef: Number
+	stationRef: Schema.Types.ObjectId
 });
 
 
 // Deployment location + list of firefighters
 var Deployment = new Schema({
 	location: String,
-	firefighters: [Number],
+	firefighters: [Schema.Types.ObjectId],
 	timestarted: Date,
 	timeEnded: Date
 });
