@@ -6,6 +6,7 @@ var register    = require("./register");
 var firefighter = require("./firefighter");
 var login       = require("./login");
 var logout      = require("./logout");
+var account     = require("./account");
 var router      = require("express").Router();
 var passport    = require("passport");
 var path        = require("path");
@@ -21,16 +22,26 @@ router.get("/", function(req, res) {
 	res.sendFile(p);
 });
 
+// Middleware to check authentication
+// Sends a 401 if the user is not logged in
+var checkAuth = function(req, res, next) {
+	if (!req.user) {
+		res.status(401).send("Auth required");
+	}
+	else {
+		next();
+	}
+}
 
 
 router.get("/register"     , register.get);
 router.post("/register"    , register.post);
 router.get("/login"        , login.get);
 router.get("/logout"       , logout.get);
-// Login uses passport's authenticate
-router.post("/login"       , passport.authenticate("local"), login.post);
-router.get("/firefighter"  , firefighter.get);
-router.post("/firefighter" , firefighter.post);
+router.post("/login"       , passport.authenticate("local") , login.post);
+router.get("/firefighter"  , checkAuth                      , firefighter.get);
+router.post("/firefighter" , checkAuth                      , firefighter.post);
+router.get("/account"      , checkAuth                      , account.get);
 
 
 module.exports = router;
