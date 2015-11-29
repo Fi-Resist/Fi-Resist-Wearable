@@ -1,5 +1,6 @@
 angular.module("app.services")
 	.factory("firefighters", function($rootScope, event) {
+/*
 		var firefighteravatars = [
 			{"id": 1, "pic": "F1.jpg"}
 			{"id": 2, "pic": "F2.jpg"}
@@ -10,7 +11,7 @@ angular.module("app.services")
 			{"id": 7, "pic": "F7.jpg"}
 		];
 
+*/
 
 
-		
 	});
