@@ -3,7 +3,7 @@
 angular.module("app.services")
 	.factory("firefighters", function($rootScope, event) {
 		var firefighters = [];
-/*
+
 		var firefighteravatars = [
 			{"id": 1, "pic": "F1.jpg"}
 			{"id": 2, "pic": "F2.jpg"}
@@ -14,7 +14,7 @@ angular.module("app.services")
 			{"id": 7, "pic": "F7.jpg"}
 		];
 
-*/		var get = function(id) {
+		var get = function(id) {
 			if (id) {
 				for (var i = 0; i < firefighters.length; i++) {
 					if (firefighters[i].id == id) return firefighters[i]
