@@ -4,6 +4,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import org.json.*;
 
 import android.content.Context;
@@ -36,6 +37,7 @@ public class AccelerometerReader implements SensorEventListener {
 	public void onSensorChanged(SensorEvent event)
 	{
 		Sensor mySensor = event.sensor;
+		Log.d("FIRESIST", String.format("Accel: %f, %f, %f", event.values[0], event.values[1], event.values[2]));
 
 		if(mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
 		{
@@ -59,12 +61,15 @@ public class AccelerometerReader implements SensorEventListener {
 		sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
 	}	
 	
+	public float readZ() {
+			return accelValues[2];
+	}
 
 	public JSONObject readAccelerometer() throws JSONException {
 	               JSONObject json = new JSONObject();
-		       json.put("X Direction", accelValues[0]);
-		       json.put("Y Direction", accelValues[1]);
-		       json.put("Z Direction", accelValues[2]);
+		       json.put("x", accelValues[0]);
+		       json.put("y", accelValues[1]);
+		       json.put("z", accelValues[2]);
 		       return json;
 	}
 }

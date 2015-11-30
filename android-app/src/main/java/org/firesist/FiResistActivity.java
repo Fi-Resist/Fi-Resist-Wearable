@@ -62,7 +62,7 @@ public class FiResistActivity extends Activity
 	private SensorManager sensorManager = null;
 	private AlarmManager manager;
 	private BiometricReader biometricReader;
-	private final int INTERVAL = 1000;
+	private final int INTERVAL = 5000;
 	private TextView nameTextView;
 	private TextView azimuthText, pithText, rollText;
 	private String firefighterName;
@@ -233,11 +233,11 @@ public class FiResistActivity extends Activity
 			FiSocketHandler.getInstance()
 				.connect();
 
-			try {
+/*			try {
 				biometricReader.startReading();
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "No BioHarness found", Toast.LENGTH_SHORT).show();
-			}
+			} */
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
