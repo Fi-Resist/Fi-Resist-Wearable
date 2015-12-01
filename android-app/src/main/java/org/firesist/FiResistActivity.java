@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.firesist.receiver.FiReceiver;
 import org.firesist.sockethandler.FiSocketHandler;
 import org.firesist.biometric.BiometricReader;
+import org.firesist.position.AccelerometerReader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -57,12 +58,11 @@ public class FiResistActivity extends Activity
 	
 	private SharedPreferences settings;
 	private FiReceiver receiver;
-	private PendingIntent pendingIntent;
 	private SensorFusion sensorFusion;
 	private SensorManager sensorManager = null;
 	private AlarmManager manager;
 	private BiometricReader biometricReader;
-	private final int INTERVAL = 5000;
+	private AccelerometerReader accelerometerReader;
 	private TextView nameTextView;
 	private TextView azimuthText, pithText, rollText;
 	private String firefighterName;
@@ -111,6 +111,9 @@ public class FiResistActivity extends Activity
 
 		//initialize biometric reader
 		biometricReader = new BiometricReader();
+
+		//initialize accelerometer reader
+		accelerometerReader = new AccelerometerReader(this);
 		
 		// Initialize socket connection
 		FiSocketHandler.getInstance()
@@ -118,7 +121,6 @@ public class FiResistActivity extends Activity
 
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
-		pendingIntent = PendingIntent.getBroadcast(this, 0, socketIntent, 0);
 		
 	}
 
@@ -159,10 +161,6 @@ public class FiResistActivity extends Activity
 		editor.putString("FIREFIGHTER_NAME", firefighterName);
 		editor.commit();
 
-		// Disconnect Socket
-		if (manager != null) {
-			manager.cancel(pendingIntent);
-		}
 		try {
 			FiSocketHandler.getInstance()
 				.disconnect();
@@ -233,6 +231,9 @@ public class FiResistActivity extends Activity
 			FiSocketHandler.getInstance()
 				.connect();
 
+			// start listening
+			accelerometerReader.startListening();
+
 /*			try {
 				biometricReader.startReading();
 			} catch (RuntimeException e) {
@@ -243,8 +244,7 @@ public class FiResistActivity extends Activity
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 			vibrator.vibrate(500);
 
-			manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
+
 	}
 
 	/**
@@ -252,19 +252,17 @@ public class FiResistActivity extends Activity
 	 */
 	public void cancelAlarm(View view) {
 		biometricReader.stopReading();
+		accelerometerReader.stopListening();
 
-		if (manager != null) {
-			manager.cancel(pendingIntent);
-			try {
-				FiSocketHandler.getInstance()
-					.disconnect();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-
-			Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
+		try {
+			FiSocketHandler.getInstance()
+				.disconnect();
+		} catch(JSONException e) {
+			e.printStackTrace();
 		}
+
+		Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();
+		
 	}
 	
 	/**
