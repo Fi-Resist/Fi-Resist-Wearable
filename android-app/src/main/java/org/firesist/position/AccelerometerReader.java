@@ -7,6 +7,7 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import org.json.JSONObject;
 import org.json.JSONException;
+import com.goatstone.util.SensorFusion;
 
 import org.firesist.sockethandler.FiSocketHandler;
 
@@ -34,8 +35,10 @@ public class AccelerometerReader implements SensorEventListener {
 	private ArrayList<Float> velocityList;
 	private ArrayList<Float> accelerationList;
 	private ArrayList<Float> positionList;
+	private ArrayList<Float> azimuthList;
 	private float lastAccel;
 	private final String UPDATE_POSITION = "update-position";
+	private SensorFusion sensorFusion;
 
 	public AccelerometerReader(Context context)
 	{
@@ -47,12 +50,14 @@ public class AccelerometerReader implements SensorEventListener {
 		velocityList = new ArrayList<>();
 		accelerationList = new ArrayList<>();
 		positionList = new ArrayList<>();
+		azimuthList = new ArrayList<>();
 
 		velocityList.add(new Float((float)0));
 		positionList.add(new Float((float)0));
 		accelerationList.add(new Float((float)0));
 
-
+		sensorFusion = new SensorFusion();
+		sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
 
 
 		if(sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).size()>0) {
@@ -93,7 +98,9 @@ public class AccelerometerReader implements SensorEventListener {
 	public void startListening() {
 
 		pastTime = System.currentTimeMillis();
-		sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_NORMAL);
+		sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_FASTEST);
+		sensorManager.registerListener(this,
+					   	sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	public void stopListening() {
@@ -110,10 +117,16 @@ public class AccelerometerReader implements SensorEventListener {
 	public void onSensorChanged(SensorEvent event)
 	{
 		Sensor mySensor = event.sensor;
-		accelerationList.add(new Float(event.values[2]));
 
 		if(mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
 		{
+
+			sensorFusion.setAccel(event.values);
+			sensorFusion.calculateAccMagOrientation();
+
+			accelerationList.add(new Float(event.values[2]));
+			azimuthList.add(new Float(sensorFusion.getAzimuth()));
+			Log.d("AZ", String.format("Azimuth %f", sensorFusion.getAzimuth()));
 			accelValues[0] = new Float(event.values[0]);
 			accelValues[1] = new Float(event.values[1]);
 			accelValues[2] = new Float(event.values[2]);
@@ -122,7 +135,9 @@ public class AccelerometerReader implements SensorEventListener {
 				Log.d("ACCEL", "5 seconds has passed");
 				try {
 					JSONObject json = new JSONObject();
+					Float orientation = getMedian(azimuthList);
 					json.put("pos", calcDistance(event.values[2], pastTime - startTime));
+					json.put("orientation", orientation);
 					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
 				} catch (JSONException e) {
 						e.printStackTrace();
@@ -131,9 +146,11 @@ public class AccelerometerReader implements SensorEventListener {
 
 				Log.d("ACCEL", String.format("%f", calcDistance(event.values[2], pastTime - startTime)));
 				accelerationList.clear();
+				azimuthList.clear();
 			}
-
-
+		}
+		if (mySensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+				sensorFusion.setMagnet(event.values);
 		}
 	}	
 
