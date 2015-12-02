@@ -64,7 +64,9 @@ public class BiometricReader {
 	  */
 	public void stopReading() {
 		// Disconnect bioharness
-		btClient.removeConnectedEventListener(connectedListener);
-		btClient.Close();
+		if (btClient != null && btClient.IsConnected()) {
+			btClient.removeConnectedEventListener(connectedListener);
+			btClient.Close();
+		}
 	}
 }
