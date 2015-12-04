@@ -6,12 +6,12 @@ angular.module("app.services")
 
 		
 		var images = [
-			{pic: 'F1.jpg'}
-			{pic: 'F2.jpg'}
-			{pic: 'F3.jpg'}
-			{pic: 'F4.jpg'}
-			{pic: 'F5.jpg'}
-			{pic: 'F6.jpg'}
+			{pic: 'F1.jpg'},
+			{pic: 'F2.jpg'},
+			{pic: 'F3.jpg'},
+			{pic: 'F4.jpg'},
+			{pic: 'F5.jpg'},
+			{pic: 'F6.jpg'},
 			{pic: 'F7.jpg'}
 		];
 
