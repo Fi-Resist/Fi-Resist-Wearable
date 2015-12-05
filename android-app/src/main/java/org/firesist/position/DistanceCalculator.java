@@ -4,6 +4,7 @@ import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
+import java.util.ArrayList;
 
 public class DistanceCalculator {
 
@@ -14,11 +15,14 @@ public class DistanceCalculator {
 	}
 
 
-	public double calculateDistance(Float[] acceleration, int sensorDelay) {
+	public double calculateDistance(ArrayList<Float> acceleration, int sensorDelay) {
 
-		double accel[] = new double[acceleration.length];
-		for (int i = 0; i < acceleration.length; i++) {
-			accel[i] = acceleration[i].doubleValue();
+		// apache math FFT uses doubles instead of floats
+		// (as it should)
+		double accel[] = new double[acceleration.size()];
+		for (int i = 0; i < acceleration.size(); i++) {
+			accel[i] = acceleration.get(i)
+				.doubleValue();
 		}
 
 		// FFT the acceleration
@@ -35,7 +39,12 @@ public class DistanceCalculator {
 		// FFT^-1
 		transformOutput = transformer.transform(accel, TransformType.INVERSE);
 
+		double displacement = 0;
+		for (int i = 0; i < transformOutput.length; i++) {
+			displacement += Math.abs(transformOutput[i].getReal());
+		}
+
 		// Return distance 
-		return transformOutput[transformOutput.length - 1].getReal();
+		return displacement;
 	}
 }
