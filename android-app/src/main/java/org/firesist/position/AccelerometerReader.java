@@ -39,6 +39,7 @@ public class AccelerometerReader implements SensorEventListener {
 	private float lastAccel;
 	private final String UPDATE_POSITION = "update-position";
 	private SensorFusion sensorFusion;
+	private DistanceCalculator distanceCalculator;
 
 	public AccelerometerReader(Context context)
 	{
@@ -58,6 +59,7 @@ public class AccelerometerReader implements SensorEventListener {
 
 		sensorFusion = new SensorFusion();
 		sensorFusion.setMode(SensorFusion.Mode.ACC_MAG);
+		distanceCalculator = new DistanceCalculator();
 
 
 		if(sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).size()>0) {
@@ -130,8 +132,24 @@ public class AccelerometerReader implements SensorEventListener {
 			accelValues[0] = new Float(event.values[0]);
 			accelValues[1] = new Float(event.values[1]);
 			accelValues[2] = new Float(event.values[2]);
-			if (System.currentTimeMillis() >= (pastTime + (5 * 1000))) {
+			if (accelerationList.size() == 512) {
+				Log.d("FFT", String.format("%f", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST)));
+				try {
+					JSONObject json = new JSONObject();
+					json.put("pos", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST));
+					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+
+				accelerationList.clear();
+
+			}
+
+/*			if (System.currentTimeMillis() >= (pastTime + (5 * 1000))) {
 				pastTime = System.currentTimeMillis();
+				Log.d("FFT", String.format("%f", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST)));
 				Log.d("ACCEL", "5 seconds has passed");
 				try {
 					JSONObject json = new JSONObject();
@@ -147,7 +165,7 @@ public class AccelerometerReader implements SensorEventListener {
 				Log.d("ACCEL", String.format("%f", calcDistance(event.values[2], pastTime - startTime)));
 				accelerationList.clear();
 				azimuthList.clear();
-			}
+			} */
 		}
 		if (mySensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 				sensorFusion.setMagnet(event.values);
