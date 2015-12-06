@@ -10,11 +10,16 @@ import java.util.ArrayList;
 public class DistanceCalculator {
 
 	private FastFourierTransformer transformer;
+	private double storedDisplacement;
 
 	public DistanceCalculator() {
 		transformer = new FastFourierTransformer(DftNormalization.STANDARD);
+		storedDisplacement = 0;
 	}
 
+	public void clearStoredDisplacement() {
+		storedDisplacement = 0;
+	}
 
 	public double calculateDistance(ArrayList<Float> acceleration, double sensorDelay) {
 
@@ -47,8 +52,9 @@ public class DistanceCalculator {
 
 		double displacement = 0;
 		displacement = Math.abs(transformOutput[transformOutput.length - 1].getReal());
+		storedDisplacement = displacement + storedDisplacement;
 
 		// Return distance 
-		return displacement;
+		return storedDisplacement;
 	}
 }

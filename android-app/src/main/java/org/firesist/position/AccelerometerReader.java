@@ -39,6 +39,7 @@ public class AccelerometerReader implements SensorEventListener {
 	private ArrayList<Float> positionList;
 	private ArrayList<Float> azimuthList;
 	private float lastAccel;
+	private Float prevOrientation;
 	private final String UPDATE_POSITION = "update-position";
 	private SensorFusion sensorFusion;
 	private DistanceCalculator distanceCalculator;
@@ -103,7 +104,7 @@ public class AccelerometerReader implements SensorEventListener {
 	}
 
 	public void startListening() {
-
+		distanceCalculator.clearStoredDisplacement();
 		pastTime = System.currentTimeMillis();
 		sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_FASTEST);
 		sensorManager.registerListener(this,
@@ -138,17 +139,30 @@ public class AccelerometerReader implements SensorEventListener {
 			accelValues[1] = new Float(event.values[1]);
 			accelValues[2] = new Float(event.values[2]);
 			if (accelerationList.size() == 128) {
-				double distance = distanceCalculator.calculateDistance(accelerationList, 36.67);
-				Log.d("FFT", String.format("%f", distance));
 				try {
 					JSONObject json = new JSONObject();
 					vibrator.vibrate(500);
 					Float orientation = getMedian(azimuthList);
+					if (prevOrientation == null) {
+						prevOrientation = orientation;
+					}
 
-					json.put("pos", distance);
-					//json.put("accel", new JSONArray(accelerationList));
-					json.put("orientation", orientation);
-					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
+
+					double distance = distanceCalculator.calculateDistance(accelerationList, 36.67);
+					//Turn detection
+					if (Math.abs(orientation - prevOrientation) > 30 || distance >= 5) {
+						distanceCalculator.clearStoredDisplacement();
+					}
+
+
+					Log.d("FFT", String.format("%f", distance));
+					if (distance >= 5) {
+						json.put("pos", distance);
+						json.put("orientation", orientation);
+						FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
+						prevOrientation = orientation;
+					}
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -210,5 +224,6 @@ public class AccelerometerReader implements SensorEventListener {
 		       json.put("z", accelValues[2]);
 		       return json;
 	}
+
 }
 
