@@ -61,11 +61,9 @@ public class FiResistActivity extends Activity {
 	private BiometricReader biometricReader;
 	private AccelerometerReader accelerometerReader;
 	private TextView nameTextView;
-	private TextView azimuthText, pithText, rollText;
 	private String firefighterName;
 
 	private DecimalFormat d = new DecimalFormat("#.##");
-	private RadioGroup setModeRadioGroup;
 
 
 
@@ -96,10 +94,6 @@ public class FiResistActivity extends Activity {
 		d.setMinimumFractionDigits(2);
 
 
-		setModeRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
-		azimuthText = (TextView) findViewById(R.id.azmuth);
-		pithText = (TextView) findViewById(R.id.pitch);
-		rollText = (TextView) findViewById(R.id.roll);
 
 		//initialize biometric reader
 		biometricReader = new BiometricReader();

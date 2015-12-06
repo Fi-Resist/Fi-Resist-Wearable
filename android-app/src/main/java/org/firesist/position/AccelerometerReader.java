@@ -6,8 +6,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import com.goatstone.util.SensorFusion;
+import android.os.Vibrator;
 
 import org.firesist.sockethandler.FiSocketHandler;
 
@@ -40,10 +42,13 @@ public class AccelerometerReader implements SensorEventListener {
 	private final String UPDATE_POSITION = "update-position";
 	private SensorFusion sensorFusion;
 	private DistanceCalculator distanceCalculator;
+	private Vibrator vibrator;
 
 	public AccelerometerReader(Context context)
 	{
 		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
 		pastTime = System.currentTimeMillis();
 		startTime = pastTime;
 		lastAccel = 0;
@@ -126,17 +131,23 @@ public class AccelerometerReader implements SensorEventListener {
 			sensorFusion.setAccel(event.values);
 			sensorFusion.calculateAccMagOrientation();
 
-			accelerationList.add(new Float(event.values[2]));
+			accelerationList.add(new Float(event.values[0]));
 			azimuthList.add(new Float(sensorFusion.getAzimuth()));
 			Log.d("AZ", String.format("Azimuth %f", sensorFusion.getAzimuth()));
 			accelValues[0] = new Float(event.values[0]);
 			accelValues[1] = new Float(event.values[1]);
 			accelValues[2] = new Float(event.values[2]);
-			if (accelerationList.size() == 512) {
-				Log.d("FFT", String.format("%f", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST)));
+			if (accelerationList.size() == 128) {
+				double distance = distanceCalculator.calculateDistance(accelerationList, 36.67);
+				Log.d("FFT", String.format("%f", distance));
 				try {
 					JSONObject json = new JSONObject();
-					json.put("pos", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST));
+					vibrator.vibrate(500);
+					Float orientation = getMedian(azimuthList);
+
+					json.put("pos", distance);
+					//json.put("accel", new JSONArray(accelerationList));
+					json.put("orientation", orientation);
 					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
 				} catch (JSONException e) {
 					e.printStackTrace();
