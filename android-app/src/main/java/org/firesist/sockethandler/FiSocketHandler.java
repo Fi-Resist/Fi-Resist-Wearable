@@ -21,6 +21,7 @@ public class FiSocketHandler {
 	private String firefighterName;
 	private static FiSocketHandler fiSocketHandlerInstance;
 	private Socket socket;
+	public double storedDistance = 0;
 
 	/**
 	 * Constructor initializes socket to server url, and generates an Id
@@ -77,6 +78,7 @@ public class FiSocketHandler {
 	public static FiSocketHandler getInstance() {
 		return fiSocketHandlerInstance;
 	}
+
 
 
 	/**

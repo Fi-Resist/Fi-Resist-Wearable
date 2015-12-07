@@ -47,6 +47,7 @@ import android.content.SharedPreferences;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.InputType;
+import android.os.Handler;
 
 import org.json.JSONObject;
 
@@ -61,6 +62,7 @@ public class FiResistActivity extends Activity {
 	private BiometricReader biometricReader;
 	private AccelerometerReader accelerometerReader;
 	private TextView nameTextView;
+	private TextView distanceText;
 	private String firefighterName;
 
 	private DecimalFormat d = new DecimalFormat("#.##");
@@ -77,6 +79,7 @@ public class FiResistActivity extends Activity {
 		this.settings = getPreferences(MODE_PRIVATE);
 
 		nameTextView = (TextView) findViewById(R.id.firefighter_name);
+		distanceText = (TextView) findViewById(R.id.distance);
 
 		// Set the firefighter name if it's been done before
 		firefighterName = settings.getString("FIREFIGHTER_NAME", null);
@@ -107,6 +110,21 @@ public class FiResistActivity extends Activity {
 
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
+
+		final Handler h = new Handler();
+		h.postDelayed(new Runnable() {
+				private double distance = 0;
+				private String text = "";
+				@Override
+				public void run() {
+						if (FiSocketHandler.getInstance().storedDistance != distance) {
+								distance = FiSocketHandler.getInstance().storedDistance;
+								text = String.format("%s\n%f", text, distance);
+								distanceText.setText(text);
+						}
+						h.postDelayed(this, 1000);
+				}
+		}, 1000);
 		
 	}
 

@@ -25,6 +25,11 @@
 	android:text="Disconnect"
 	android:onClick="cancelAlarm" />
 
+<TextView
+		android:id="@+id/distance"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
 
 </LinearLayout>
 

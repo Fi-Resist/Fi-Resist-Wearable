@@ -38,6 +38,7 @@ public class AccelerometerReader implements SensorEventListener {
 	private ArrayList<Float> accelerationList;
 	private ArrayList<Float> positionList;
 	private ArrayList<Float> azimuthList;
+	private int readCount;
 	private float lastAccel;
 	private Float prevOrientation;
 	private final String UPDATE_POSITION = "update-position";
@@ -53,6 +54,7 @@ public class AccelerometerReader implements SensorEventListener {
 		pastTime = System.currentTimeMillis();
 		startTime = pastTime;
 		lastAccel = 0;
+		readCount = 0;
 
 		velocityList = new ArrayList<>();
 		accelerationList = new ArrayList<>();
@@ -112,6 +114,7 @@ public class AccelerometerReader implements SensorEventListener {
 	}
 
 	public void stopListening() {
+		distanceCalculator.clearStoredDisplacement();
 		sensorManager.unregisterListener(this);
 	}
 
@@ -138,10 +141,10 @@ public class AccelerometerReader implements SensorEventListener {
 			accelValues[0] = new Float(event.values[0]);
 			accelValues[1] = new Float(event.values[1]);
 			accelValues[2] = new Float(event.values[2]);
-			if (accelerationList.size() == 128) {
+			if (accelerationList.size() == 256) {
+				readCount++;
 				try {
 					JSONObject json = new JSONObject();
-					vibrator.vibrate(500);
 					Float orientation = getMedian(azimuthList);
 					if (prevOrientation == null) {
 						prevOrientation = orientation;
@@ -150,18 +153,22 @@ public class AccelerometerReader implements SensorEventListener {
 
 					double distance = distanceCalculator.calculateDistance(accelerationList, 36.67);
 					//Turn detection
-					if (Math.abs(orientation - prevOrientation) > 30 || distance >= 5) {
+					if (Math.abs(orientation - prevOrientation) > 30 ) {
 						distanceCalculator.clearStoredDisplacement();
+						readCount = 10;
+
 					}
 
 
 					Log.d("FFT", String.format("%f", distance));
-					if (distance >= 5) {
 						json.put("pos", distance);
 						json.put("orientation", orientation);
 						FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
+						FiSocketHandler.getInstance().storedDistance = distance;
+						vibrator.vibrate(500);
 						prevOrientation = orientation;
-					}
+						distanceCalculator.clearStoredDisplacement();
+						readCount = 0;
 
 				} catch (JSONException e) {
 					e.printStackTrace();
