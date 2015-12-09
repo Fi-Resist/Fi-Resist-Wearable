@@ -111,7 +111,7 @@ public class FiResistActivity extends Activity {
 		// Set up socket background task
 		Intent socketIntent = new Intent(this, FiReceiver.class);
 
-		final Handler h = new Handler();
+/*		final Handler h = new Handler();
 		h.postDelayed(new Runnable() {
 				private double distance = 0;
 				private String text = "";
@@ -124,7 +124,7 @@ public class FiResistActivity extends Activity {
 						}
 						h.postDelayed(this, 1000);
 				}
-		}, 1000);
+	 	}, 1000); */
 		
 	}
 
@@ -170,11 +170,11 @@ public class FiResistActivity extends Activity {
 			// start listening
 			accelerometerReader.startListening();
 
-/*			try {
+			try {
 				biometricReader.startReading();
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "No BioHarness found", Toast.LENGTH_SHORT).show();
-			} */
+			} 
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);

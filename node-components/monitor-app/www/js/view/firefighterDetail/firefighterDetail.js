@@ -17,7 +17,7 @@ angular.module("app.controllers")
 				}
 				else {
 					var diff = p.orientation - firefighter.position[index - 1].orientation;
-					direction = (diff > 0) ? "LEFT" : "RIGHT";
+					direction = (diff < 0) ? "LEFT" : "RIGHT";
 
 					orientation = Math.abs(diff); 
 

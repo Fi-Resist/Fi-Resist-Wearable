@@ -12,7 +12,7 @@
 		</ion-list>
 		<h3>Movement History</h3>
 		<ion-list>
-			<ion-item ng-repeat="pos in firefighter.position">
+			<ion-item collection-repeat="pos in firefighter.position">
 			{{pos.orientation}}<span ng-show="pos.direction">&deg;</span> {{pos.direction}},  {{pos.pos | number:3}}m
 			</ion-item>
 	</ion-content>
