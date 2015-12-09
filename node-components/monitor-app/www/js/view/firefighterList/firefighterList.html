@@ -3,7 +3,7 @@
 		<ion-list>
 			<ion-item ng-repeat="firefighter in firefighters"
 				ui-sref="app.firefighterDetail({id:firefighter.id})"
-				ng-class="{'item-assertive': isInDanger(firefighter)}">
+				ng-class="{'item-assertive': isInDanger(firefighter), 'item-energized': isWarn(firefighter)}">
 				<div class="row">
 					<div class="col">
 						{{firefighter.bio.name}}
