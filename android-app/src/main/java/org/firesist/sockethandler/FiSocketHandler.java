@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import java.net.URISyntaxException;
 import android.util.Log;
+import java.util.ArrayList;
+
 /**
   * Web socket communication for FiResist
   */
@@ -22,6 +24,7 @@ public class FiSocketHandler {
 	private static FiSocketHandler fiSocketHandlerInstance;
 	private Socket socket;
 	public double storedDistance = 0;
+	public ArrayList<Double> distanceList;
 
 	/**
 	 * Constructor initializes socket to server url, and generates an Id
@@ -50,6 +53,7 @@ public class FiSocketHandler {
 	 * Initialize socket connection
 	 */
 	public void initSocket(String url) {
+		distanceList = new ArrayList<>();
 		try {
 			socket = IO.socket(url);
 		} catch (URISyntaxException e) {

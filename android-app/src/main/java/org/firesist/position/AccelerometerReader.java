@@ -32,29 +32,25 @@ public class AccelerometerReader implements SensorEventListener {
 	private SensorManager sensorManager;
 	private Sensor accelSensor;
 	private float[] accelValues = new float[3];
-	private long pastTime;
-	private long startTime;
 	private ArrayList<Float> velocityList;
 	private ArrayList<Float> accelerationList;
 	private ArrayList<Float> positionList;
 	private ArrayList<Float> azimuthList;
-	private int readCount;
 	private float lastAccel;
 	private Float prevOrientation;
 	private final String UPDATE_POSITION = "update-position";
 	private SensorFusion sensorFusion;
 	private DistanceCalculator distanceCalculator;
 	private Vibrator vibrator;
+	private boolean initialHasSent; 
+	private long lastTime;
 
 	public AccelerometerReader(Context context)
 	{
 		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-		pastTime = System.currentTimeMillis();
-		startTime = pastTime;
 		lastAccel = 0;
-		readCount = 0;
 
 		velocityList = new ArrayList<>();
 		accelerationList = new ArrayList<>();
@@ -77,37 +73,10 @@ public class AccelerometerReader implements SensorEventListener {
 	}
 
 
-	private float calcDistance(Float newAccel, long timeElapsed) {
-		Float oldAccel = getMedian(accelerationList);
-		Float oldPosition = positionList.get(positionList.size() - 1);
-		Float oldVelocity = velocityList.get(velocityList.size() - 1);
-
-
-
-		//calculate new velocity
-		Float newVelocity = ((newAccel - oldAccel) );
-
-
-		//calculate new position
-		Float newPosition = ((newVelocity - oldVelocity));
-
-		Log.d("ACCEL", String.format("Unfiltered position %f", newPosition));
-
-		// add new values
-		accelerationList.add(newAccel);
-		positionList.add(newPosition);
-		velocityList.add(newVelocity);
-
-
-		//filter results
-		Long aLong = (long) (245) / (245 + (5));
-		Float a = aLong.floatValue();
-		return Math.abs((a * oldPosition) + (1 - a) * newPosition); 
-	}
-
 	public void startListening() {
+		initialHasSent = false;
+		lastTime = System.currentTimeMillis();
 		distanceCalculator.clearStoredDisplacement();
-		pastTime = System.currentTimeMillis();
 		sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_FASTEST);
 		sensorManager.registerListener(this,
 					   	sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
@@ -124,6 +93,15 @@ public class AccelerometerReader implements SensorEventListener {
 			return l.get(middle);
 	}
 
+	private Float getMean(List<Float> l) {
+		Float mean = 0f;
+		for (Float f : l) {
+			mean += f;
+		}
+
+		return mean / l.size();
+	}
+
 	@Override 
 	public void onSensorChanged(SensorEvent event)
 	{
@@ -131,21 +109,40 @@ public class AccelerometerReader implements SensorEventListener {
 
 		if(mySensor.getType() == Sensor.TYPE_ACCELEROMETER)
 		{
+			final float alpha = (float)0.8;
+
+			float gravity[] = new float[3];
+			gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+			gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+			gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
 
 			sensorFusion.setAccel(event.values);
 			sensorFusion.calculateAccMagOrientation();
 
-			accelerationList.add(new Float(event.values[0]));
+			accelerationList.add(new Float(event.values[1] - gravity[1]));
 			azimuthList.add(new Float(sensorFusion.getAzimuth()));
-			Log.d("AZ", String.format("Azimuth %f", sensorFusion.getAzimuth()));
-			accelValues[0] = new Float(event.values[0]);
-			accelValues[1] = new Float(event.values[1]);
-			accelValues[2] = new Float(event.values[2]);
-			if (accelerationList.size() == 256) {
-				readCount++;
+			if (!initialHasSent && (getMean(azimuthList) != 0)) {
 				try {
+					JSONObject initial = new JSONObject();
+					initial.put("pos", 0);
+					initial.put("orientation", sensorFusion.getAzimuth());
+					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, initial);
+					initialHasSent = true;
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			accelValues[0] = new Float(event.values[0] - gravity[0]);
+			accelValues[1] = new Float(event.values[1] - gravity[1]);
+			accelValues[2] = new Float(event.values[2] - gravity[2]);
+
+//			Log.d("TIMECHECK", String.format("%d", (System.currentTimeMillis() - lastTime))); 
+			if ((System.currentTimeMillis() - lastTime) >= 5000 ) {
+				try {
+					lastTime = System.currentTimeMillis();
 					JSONObject json = new JSONObject();
-					Float orientation = getMedian(azimuthList);
+					Float orientation = getMean(azimuthList);
 					if (prevOrientation == null) {
 						prevOrientation = orientation;
 					}
@@ -155,20 +152,19 @@ public class AccelerometerReader implements SensorEventListener {
 					//Turn detection
 					if (Math.abs(orientation - prevOrientation) > 30 ) {
 						distanceCalculator.clearStoredDisplacement();
-						readCount = 10;
-
 					}
 
 
-					Log.d("FFT", String.format("%f", distance));
-						json.put("pos", distance);
+					// 2 meters ~= 6.5 ft
+//					if (distance >= 2) {
+						json.put("pos", distance * 2);
 						json.put("orientation", orientation);
+
 						FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
-						FiSocketHandler.getInstance().storedDistance = distance;
-						vibrator.vibrate(500);
+						FiSocketHandler.getInstance().storedDistance = distance * 2;
 						prevOrientation = orientation;
 						distanceCalculator.clearStoredDisplacement();
-						readCount = 0;
+//					}
 
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -178,26 +174,6 @@ public class AccelerometerReader implements SensorEventListener {
 				accelerationList.clear();
 
 			}
-
-/*			if (System.currentTimeMillis() >= (pastTime + (5 * 1000))) {
-				pastTime = System.currentTimeMillis();
-				Log.d("FFT", String.format("%f", distanceCalculator.calculateDistance(accelerationList, SensorManager.SENSOR_DELAY_FASTEST)));
-				Log.d("ACCEL", "5 seconds has passed");
-				try {
-					JSONObject json = new JSONObject();
-					Float orientation = getMedian(azimuthList);
-					json.put("pos", calcDistance(event.values[2], pastTime - startTime));
-					json.put("orientation", orientation);
-					FiSocketHandler.getInstance().sendUpdate(UPDATE_POSITION, json);
-				} catch (JSONException e) {
-						e.printStackTrace();
-				}
-
-
-				Log.d("ACCEL", String.format("%f", calcDistance(event.values[2], pastTime - startTime)));
-				accelerationList.clear();
-				azimuthList.clear();
-			} */
 		}
 		if (mySensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 				sensorFusion.setMagnet(event.values);

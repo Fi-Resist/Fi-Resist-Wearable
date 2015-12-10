@@ -118,13 +118,14 @@ public class FiResistActivity extends Activity {
 				@Override
 				public void run() {
 						if (FiSocketHandler.getInstance().storedDistance != distance) {
-								distance = FiSocketHandler.getInstance().storedDistance;
-								text = String.format("%s\n%f", text, distance);
-								distanceText.setText(text);
+							distance = FiSocketHandler.getInstance().storedDistance;
+							text = String.format("%s\n%f", text, distance);
+							distanceText.setText(text);
+								//distanceText.setText(FiSocketHandler.getInstance().distanceList.toString());
 						}
-						h.postDelayed(this, 1000);
+						h.postDelayed(this, 10);
 				}
-	 	}, 1000); */
+	 	}, 1000);  */
 		
 	}
 
@@ -174,7 +175,7 @@ public class FiResistActivity extends Activity {
 				biometricReader.startReading();
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "No BioHarness found", Toast.LENGTH_SHORT).show();
-			} 
+			}  
 
 			//Vibrate indicating connection success
 			Vibrator vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);

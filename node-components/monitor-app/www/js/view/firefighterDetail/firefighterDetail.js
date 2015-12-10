@@ -13,11 +13,12 @@ angular.module("app.controllers")
 				var direction = "";
 				var orientation = p.orientation;
 				if (index == 0) {
-					direction = "START";
+					direction = "STARTING ORIENTATION";
 				}
 				else {
 					var diff = p.orientation - firefighter.position[index - 1].orientation;
 					direction = (diff < 0) ? "LEFT" : "RIGHT";
+					if (diff == 0) direction = "STRAIGHT";
 
 					orientation = Math.abs(diff); 
 
