@@ -19,7 +19,7 @@
     "ionic": "1.7.7"
   },
   "devDependencies": {
-    "bower": "1.5.3",
+    "bower": "1.8.8",
     "chai": "3.3.0",
     "karma": "0.13.10",
     "karma-chai": "0.1.0",
